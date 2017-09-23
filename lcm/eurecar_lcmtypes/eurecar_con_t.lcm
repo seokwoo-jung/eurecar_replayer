@@ -1,0 +1,21 @@
+package eurecar;
+
+/**
+ * Eurecar control & reference input 
+ */
+
+struct con_t
+{
+	int64_t utime;				// utime [usec]
+	boolean auto_sw;			// auto/manual SW. (1:auto)
+	boolean run_sw;				// Run/E-stop SW.  (1:run)
+	boolean solenoid;	    	// power magnetic clutch 
+	boolean T_init;	    		// throttle pedal initialized
+	byte brk_enc;				// brake encoder
+	int16_t B_PWM;				// brake control PWM input
+	int16_t T_PWM;				// throttle control PWM input
+	double ref_vel;				// speed reference input  [km/h]
+	double ref_brk_enc;			// calculated brake encoder input [%]
+	double ref_brk_apv;			// calculated accel pedal value input [%]
+	double ref_steer;			// steering wheel reference input [deg]
+}

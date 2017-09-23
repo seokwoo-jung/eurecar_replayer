@@ -1,0 +1,7 @@
+package eurecar;
+
+struct vision_pedestrian
+{
+	int64_t timestamp;
+	boolean pedestrian_crossing; // false : crossing complete (car can go) , true: crossing (car should stop and waiting)
+}

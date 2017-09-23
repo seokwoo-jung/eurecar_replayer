@@ -1,0 +1,17 @@
+package eurecar;
+
+/**
+ * Eurecar navigation data
+ */
+
+struct nav_t
+{
+    int64_t utime;		//!< GPS time
+
+	// (0,0) at Eureka building
+	// heading + cw direction
+	double x;	//!< x position [m]
+	double y;	//!< y position [m]
+	double h;	//!< heading [rad]
+
+}

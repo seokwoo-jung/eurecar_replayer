@@ -1,0 +1,16 @@
+package eurecar;
+
+/**
+ * Eurecar lane info from aerial image
+ */
+
+struct lane_t
+{
+    int64_t utime;
+
+    int32_t n;
+    double l_east[n];
+    double l_north[n];
+    double l_lat[n];
+    double l_lon[n];
+}

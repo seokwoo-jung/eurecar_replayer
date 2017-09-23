@@ -1,0 +1,12 @@
+package eurecar;
+
+/**
+ * Eurecar Path info from control
+ */
+
+struct Path_t
+{
+    int64_t utime;
+    int32_t n;
+    double pathxy[n];
+}

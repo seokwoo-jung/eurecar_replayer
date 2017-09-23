@@ -1,0 +1,11 @@
+package eurecar;
+
+/**
+ * Eurecar  velodyne raw data
+ */
+
+struct velo_raw
+{
+	int64_t utime;				// utime 												[usec] 
+	byte raw[1206]; 			//raw data
+}

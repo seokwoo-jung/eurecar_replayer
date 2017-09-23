@@ -1,0 +1,26 @@
+package eurecar;
+
+struct mission_request
+{
+	int64_t timestamp;
+	
+	int32_t request[16]; 
+}
+
+/* request array allocation info
+
+0 ~3 : mission number 
+4: 차선
+5: 정지선
+6: 보행자여부
+7: 신호등
+8: 표지판
+9: 전방차량 유무
+10: 전방차량과의 거리
+11: 비상정지 유무
+12: 비상정지와의 거리
+13: 주차구역의 모서리
+14: none
+15: none
+
+*/

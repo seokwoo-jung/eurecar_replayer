@@ -1,0 +1,15 @@
+package eurecar;
+
+/**
+ * Eurecar GPS raw data(velocity & heading)
+ */
+
+struct rmc_t
+{
+	int64_t utime;			// utime [usec]
+	double time;			// GPS time [ms]
+	double speed;			// speed [km/h]
+	double heading; 		// Track angle in degrees True cw
+	double lat;				// lat [decimal deg]
+	double lon;	    		// lon [decimal deg]
+}

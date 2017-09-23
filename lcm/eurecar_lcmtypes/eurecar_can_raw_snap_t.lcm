@@ -1,0 +1,13 @@
+package eurecar;
+
+/**
+ * Eurecar  can_raw_snap
+ */
+
+struct can_raw_snap_t
+{
+	int64_t utime;			// utime [usec]
+	int32_t len_this;
+	byte mobileye[len_this];
+}
+	

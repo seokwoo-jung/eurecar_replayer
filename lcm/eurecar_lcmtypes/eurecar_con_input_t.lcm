@@ -1,0 +1,12 @@
+package eurecar;
+
+/**
+ * Eurecar control input from PC
+ */
+
+struct con_input_t
+{
+	int64_t utime;				// utime [usec]
+	double ref_vel;				// speed reference input  [km/h]
+	double ref_steer;			// steering wheel reference input [deg]
+}

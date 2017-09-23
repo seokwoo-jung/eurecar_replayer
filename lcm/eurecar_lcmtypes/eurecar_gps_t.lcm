@@ -1,0 +1,14 @@
+package eurecar;
+
+/**
+ * Eurecar gps data
+ */
+
+struct gps_t
+{
+    int64_t utime;		//!< GPS time
+
+	double lat;		//!< lat [decimal deg]
+	double lon;	    //!< lon [decimal deg]
+
+}

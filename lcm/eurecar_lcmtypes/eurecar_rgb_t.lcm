@@ -1,0 +1,14 @@
+package eurecar;
+
+/**
+ * Eurecar rgb data
+ */
+
+struct rgb_t
+{
+	int64_t utime;				
+	int32_t width;			
+	int32_t height;	
+	int32_t size;				
+	int32_t image[size];		 		
+}

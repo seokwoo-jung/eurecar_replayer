@@ -1,0 +1,22 @@
+package eurecar;
+
+/**
+ * Eurecar GPS raw data + Position(local coordinate) unfiltered
+ */
+
+struct gga_t
+{
+	int64_t utime;		// utime [usec]
+	double time;		// GPS time [ms]
+	double x;			// x [m]
+	double y;	    	// y [m]
+	double h;	    	// height [m]	
+	int32_t numSV;		// Number of satellites being tracked
+	int32_t postype;	// Fix quality (0 = invalid, 16 = GPS fix (SPS), 18 = waas fix)
+	int32_t lag;		// time in seconds since last DGPS update
+	double hordev;		// horizontal dilution of position
+	double lat;			// lat [decimal deg]
+	double lon;	    	// lon [decimal deg]
+	double hgt;	    	// Altitude, above mean sea level + Height of geoid (mean sea level) above WGS84 [m]
+	int32_t map_idx; 	// map index num 
+}

@@ -1,0 +1,17 @@
+package eurecar;
+
+/**
+ * Eurecar  velodyne point data
+ */
+
+struct velo_pt_t
+{
+	int64_t utime;				// utime 												[usec] 
+	int32_t time;				// velodyne system time 								[usec]
+	int16_t hor_ang[12];		// horizontal rotation angle							[deg*100]  	==> uint16
+	int16_t dist[12][32];		// dist  (0: no return within 100m )					[mm*0.5]   	==> uint16
+	byte inensity[12][32];		// inensity  (255 = most intense return)      			[0~255] 		
+	double pos_x;				// Local position X GPS Kalman filter result (+:east)	[m]		
+	double pos_y;				// Local position Y GPS Kalman filter result (+:north)  [m]		
+	double pos_h;				// heading (0 : north, CW)								[rad]	
+}

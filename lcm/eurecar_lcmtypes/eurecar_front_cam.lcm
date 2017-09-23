@@ -1,0 +1,6 @@
+package eurecar;
+
+struct front_cam
+{
+	int64_t timestamp;
+}

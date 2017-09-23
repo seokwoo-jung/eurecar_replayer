@@ -1,0 +1,10 @@
+package eurecar;
+
+struct vision_lane_pt
+{
+	int64_t timestamp;
+	int64_t num_of_points;
+	double x_coord[num_of_points];
+	double y_coord[num_of_points];
+	int32_t point_flag[num_of_points]; // -1 : left ,1: right, 0: nothing
+}

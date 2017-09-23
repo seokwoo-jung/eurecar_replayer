@@ -1,0 +1,12 @@
+package eurecar;
+
+/**
+ * Eurecar alt data
+ */
+
+struct alt_t
+{
+	int64_t systime;		// system time
+	int64_t utime;			// utime [usec]
+	double 	alt;			// alt 
+}

@@ -1,0 +1,13 @@
+package eurecar;
+
+/**
+ * Eurecar car raw data 
+ */
+
+struct can_car_raw_t
+{
+	int64_t systime;			// systime [usec]
+	int32_t cartime;    	// uint32 data
+	int32_t id;					// id
+	byte car[8];		    // mobileye raw data 
+}

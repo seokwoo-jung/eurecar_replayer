@@ -1,0 +1,10 @@
+package eurecar;
+
+struct vision_lane
+{
+	int64_t timestamp;
+	boolean left_lane_exist;
+	boolean right_lane_exist;
+	double left_lane_dot;
+	double right_lane_dot;
+}

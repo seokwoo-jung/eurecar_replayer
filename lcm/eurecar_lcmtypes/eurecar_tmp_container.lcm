@@ -1,0 +1,18 @@
+package eurecar;
+
+/**
+ * Eurecar tmp container
+ */
+
+struct tmp_container
+{
+	int64_t systime;		// system time
+	int64_t tmp_i64_1;
+	int64_t tmp_i64_2;
+	int32_t tmp_i32_1;
+	int32_t tmp_i32_2;
+	double tmp_d_1;
+	double tmp_d_2;
+	boolean tmp_b_1;
+	boolean tmp_b_2;
+}

@@ -1,0 +1,8 @@
+package eurecar;
+
+struct vision_stopline
+{
+	int64_t timestamp;
+	boolean stopline_exist;      
+	double stopline_distance;
+}

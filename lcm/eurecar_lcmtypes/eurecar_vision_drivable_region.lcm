@@ -1,0 +1,20 @@
+package eurecar;
+
+// Drivable region data format
+// Left boundary and Right boundary are fitted to 3rd order polynormial eqs.
+// it sends parameters for each eqs.
+// Left eqs : x = a_l*y^3 + b_l*y^2 + c_l*y + d_l
+// Left eqs : x = a_r*y^3 + b_r*y^2 + c_r*y + d_r  
+
+struct vision_drivable_region
+{
+	int64_t timestamp;
+ 	double a_l;
+ 	double a_r;
+ 	double b_l;
+ 	double b_r;
+ 	double c_l;
+ 	double c_r;
+ 	double d_l;
+ 	double d_r;
+}

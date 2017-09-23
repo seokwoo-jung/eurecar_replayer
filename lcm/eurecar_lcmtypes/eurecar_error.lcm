@@ -1,0 +1,12 @@
+package eurecar;
+
+/**
+ * Eurecar error count 
+ */
+
+struct Error_t
+{
+    int64_t utime;
+    int32_t n;
+    int32_t error[n];
+}

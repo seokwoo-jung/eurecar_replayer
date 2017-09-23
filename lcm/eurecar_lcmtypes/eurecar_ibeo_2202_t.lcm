@@ -1,0 +1,37 @@
+package eurecar;
+
+/**
+ * Eurecar  ibeo 2202 data
+ */
+
+struct ibeo_2202_t
+{
+	int64_t utime;			// utime [usec]
+	
+	int32_t len_prev;		// Size of prev messages  	==> uint32
+	int32_t len_this;		// Size of this messages  	==> uint32
+	byte reserved;			// reserved	
+	byte device_id;			// DeviceID
+	int16_t data_type;		// Data type              	==> uint16
+	int64_t ntp_time;		// NTP_time              	==> uint64
+	
+	int16_t scan_num;		// Scan number			 	==> uint16
+	int16_t status;			// scanner status			==> uint16	
+	int16_t offset;			// Sync phase offset		==> uint16		
+	int64_t ntp_start;		// Scan start time NTP      ==> uint64
+	int64_t ntp_end;		// Scan end time NTP        ==> uint64
+	int16_t angle;			// Angle ticks per rotation	==> uint16	
+	double angle_start;		// Start angle [rad]		
+	double angle_end;		// end angle [rad]			
+	int16_t scan_points;	// Scan points				==> uint16		
+	double pos_x;			// local position x  [m]	
+	double pos_y;			// local position y  [m]	
+	double pos_h;			// heading [rad]			
+	double mut_x;			// mounting position x  [m]	
+	double mut_y;			// mounting position y  [m]
+	double mut_z;			// mounting position z  [m]	
+	int16_t reserved2;		//reserved2					==> uint16
+
+	ibeo_scan_point_t	scan_data[len_this]; 	//scan_data
+	
+}

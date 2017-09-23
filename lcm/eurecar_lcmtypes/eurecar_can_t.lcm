@@ -1,0 +1,25 @@
+package eurecar;
+
+/**
+ * Eurecar  ECU data
+ */
+
+struct can_t
+{
+	int64_t utime;			// utime [usec]
+	double time;				// ECU time [sec]
+	double yaw_rate;			// yaw_rate (CCW) [deg/sec]
+	double mdps_torque;			// steering wheel torque (CCW) [NM]
+	double mdps_str_ang;	    // steering wheel angle (CCW) [deg]
+	double VS_CAN;	    		// vehicle speed [km/h]	
+	double lat_accel;			// lateral acceleration [m/s^2]
+	double mcp;					// master cylinder pressure [bar]
+	double accel_pedal_value;	// accel pedal value [%]
+	double tps;					// throttle position signal [%]
+	double odometer;			// odometer [km]
+	double battery_voltage;		// battery_voltage [V]
+	double WHL_SPD_RR;			// Wheel speed, rear,  right [km/h]
+	double WHL_SPD_RL;			// Wheel speed, rear,  left  [km/h]
+	double WHL_SPD_FR;			// Wheel speed, front, right [km/h]
+	double WHL_SPD_FL;			// Wheel speed, front, left  [km/h]					
+}

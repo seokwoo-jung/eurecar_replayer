@@ -1,0 +1,16 @@
+package eurecar;
+
+/**
+ * Eurecar  ibeo_scan_point
+ */
+
+struct ibeo_scan_point_t
+{
+	byte flags;				// flags
+	byte echo;				// Echo
+	double dist_radial;		// Radial distance 			[m]   	
+	double angle_horiz;		// Horizontal angle			[rad]   	
+	double angle_verti;		// Vertical angle			[rad]		
+	int16_t epw;			// Echo pulse width			=> uint16
+	int16_t reserved;		// Reserved					=> uint16
+}

@@ -1,0 +1,12 @@
+package eurecar;
+
+struct vision_vehicle_detection
+{
+	int64_t timestamp;
+	int32_t num_of_vehicles;
+	double x_coord[num_of_vehicles];
+	double y_coord[num_of_vehicles];
+	double x_vel[num_of_vehicles];
+	double y_vel[num_of_vehicles];
+	double heading[num_of_vehicles];
+}

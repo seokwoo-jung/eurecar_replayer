@@ -1,0 +1,6 @@
+package eurecar;
+
+struct avm
+{
+	int64_t timestamp;
+}

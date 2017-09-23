@@ -1,0 +1,28 @@
+package eurecar;
+
+/**
+		* Eurecar  velodyne point data 384
+		*x = d cos v sin r
+		*y = d cos v cos r
+		*z = vo + d sin v
+
+		*where
+
+		*v = vert ang
+		*r = rotational ang
+		*vo = vertical offset
+ */
+
+struct velo_384
+{
+	int64_t utime;				// utime 												[usec] 
+	int32_t time;				// velodyne system time 								[usec]
+	double rot_ang[384];		// rotational angle										[rad]  	
+	double ver_ang[384];		// vertical angle										[rad]  	
+	double dist[384];			// DIST													[m]   		
+	double ver_off[384];		// vertical offset										[m]   		
+	byte inensity[384];			// inensity  (255 = most intense return)      			[0~255] 		
+	double pos_x;				// Local position X GPS Kalman filter result (+:east)	[m]		
+	double pos_y;				// Local position Y GPS Kalman filter result (+:north)  [m]		
+	double pos_h;				// heading (0 : north, CW)								[rad]	
+}

@@ -1,0 +1,19 @@
+package eurecar;
+
+/**
+ * Eurecar filtered position and heading data
+ */
+
+struct obj_t
+{
+	int64_t utime;		// utime [usec]
+    int32_t n;
+    int32_t id[n];          // obj id
+    double  x[n];        // center x
+    double  y[n];        // center y
+	double  width[n];	// obj width
+	double  length[n];   // obj height
+	double  vel_x[n];	// y position [m]
+	double  vel_y[n];	// speed [m/sec]
+	// double  heading[n]; // heading (front = x, left = y)	
+}
