@@ -66,6 +66,8 @@ private slots:
 
     void on_pushButton_save_img_clicked();
 
+    void on_pushButton_save_lidar_data_clicked();
+
 private:
     Ui::G_MAIN_WINDOW *ui;
 

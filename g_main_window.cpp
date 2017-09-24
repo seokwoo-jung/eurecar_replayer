@@ -324,3 +324,48 @@ void G_MAIN_WINDOW::on_pushButton_save_img_clicked()
         cv::imwrite(savepath,m_ori_img[cam_ind]);
     }
 }
+
+void G_MAIN_WINDOW::on_pushButton_save_lidar_data_clicked()
+{
+    string savepath = m_img_savepath_str + "/vlp_16_" + std::to_string(m_timestamp) + ".xml";
+
+    vector<double> save_pt_data_x;
+    vector<double> save_pt_data_y;
+    vector<double> save_pt_data_z;
+    vector<uint8_t> save_pt_data_r;
+    vector<uint8_t> save_pt_data_g;
+    vector<uint8_t> save_pt_data_b;
+
+    for(unsigned int pt_ind = 0;pt_ind < c_3d_viewer_obj->cloud->points.size();pt_ind++)
+    {
+        double data_x;
+        double data_y;
+        double data_z;
+        uint8_t data_r;
+        uint8_t data_g;
+        uint8_t data_b;
+        data_x = c_3d_viewer_obj->cloud->points.at(pt_ind).x;
+        data_y = c_3d_viewer_obj->cloud->points.at(pt_ind).y;
+        data_z = c_3d_viewer_obj->cloud->points.at(pt_ind).z;
+        data_r = c_3d_viewer_obj->cloud->points.at(pt_ind).r;
+        data_g = c_3d_viewer_obj->cloud->points.at(pt_ind).g;
+        data_b = c_3d_viewer_obj->cloud->points.at(pt_ind).b;
+
+        save_pt_data_x.push_back(data_x);
+        save_pt_data_y.push_back(data_y);
+        save_pt_data_z.push_back(data_z);
+        save_pt_data_r.push_back(data_r);
+        save_pt_data_g.push_back(data_g);
+        save_pt_data_b.push_back(data_b);
+    }
+
+
+    cv::FileStorage fs(savepath,cv::FileStorage::WRITE);
+    fs << "pt_data_x" << save_pt_data_x;
+    fs << "pt_data_y" << save_pt_data_y;
+    fs << "pt_data_z" << save_pt_data_z;
+    fs << "pt_data_r" << save_pt_data_r;
+    fs << "pt_data_g" << save_pt_data_g;
+    fs << "pt_data_b" << save_pt_data_b;
+    fs.release();
+}
