@@ -1,0 +1,14 @@
+package eurecar;
+
+/**
+ * Eurecar  velodyne point data
+ */
+
+struct vlp_16_pt
+{
+	int64_t utime;				// utime[usec] 
+	double x_data_arr[32][2220]; // [mm]
+        double y_data_arr[32][2220];
+	double z_data_arr[32][2220];
+	int32_t intensity_data_arr[32][2220];
+}

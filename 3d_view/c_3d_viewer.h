@@ -74,6 +74,7 @@ public:
     double m_x_data_arr[VLP_16_HR_LASERS_NUM][VLP_16_HR_BOLCKS_NUM*VLP_16_HR_TOTAL_PACKET_NUMBER] = {{0}};
     double m_y_data_arr[VLP_16_HR_LASERS_NUM][VLP_16_HR_BOLCKS_NUM*VLP_16_HR_TOTAL_PACKET_NUMBER] = {{0}};
     double m_z_data_arr[VLP_16_HR_LASERS_NUM][VLP_16_HR_BOLCKS_NUM*VLP_16_HR_TOTAL_PACKET_NUMBER] = {{0}};
+    int m_intensity_data_arr[VLP_16_HR_LASERS_NUM][VLP_16_HR_BOLCKS_NUM*VLP_16_HR_TOTAL_PACKET_NUMBER] = {{0}};
 
     boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
 

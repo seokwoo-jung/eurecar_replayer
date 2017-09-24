@@ -50,7 +50,9 @@ public:
     C_T_GRAB_VLP_16_HR(C_3D_VIEWER* _c_3d_viewer) {
         c_3d_viewer_obj = _c_3d_viewer;
         connect(c_t_monitor_lidar,SIGNAL(SIG_C_T_MONITOR_LIDAR_2_C_T_GRAB_VLP_16_HR()),this,SLOT(SLOT_C_T_MONITOR_LIDAR_2_C_T_GRAB_VLP_16_HR()));
-        m_lcm_obj.subscribe("VELO_RAW",&C_LCM_VELO_RAW::handleMessage,&c_lcm_velo_raw_obj_rec);
+//        m_lcm_obj.subscribe("VELO_RAW",&C_LCM_VELO_RAW::handleMessage,&c_lcm_velo_raw_obj_rec);
+        m_lcm_obj.subscribe("VLP_16_PT",&C_LCM_VLP_16_PT::handleMessage,&c_lcm_vlp_16_pt_obj_rec);
+        c_t_lcmsubscr_lidar->SetLCMObj(&m_lcm_obj);
     }
     QMutex mtx_vlp_16_hr;
     QMutex mtx_update_pointcloud;
@@ -88,9 +90,11 @@ private:
 
    VLP_16_HR_DATA m_buffer_rec;
    bool GrabData(VLP_16_HR_DATA buffer_block);
+   void GrabData_pt();
 
    lcm::LCM m_lcm_obj;
    C_LCM_VELO_RAW c_lcm_velo_raw_obj_rec;
+   C_LCM_VLP_16_PT c_lcm_vlp_16_pt_obj_rec;
    eurecar::velo_raw velo_raw_data;
 
 

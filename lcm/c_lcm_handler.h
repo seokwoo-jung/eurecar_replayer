@@ -4,8 +4,11 @@
 #include "eurecar_lcmtypes/eurecar/cam.hpp"
 #include "eurecar_lcmtypes/eurecar/can_t.hpp"
 #include "eurecar_lcmtypes/eurecar/velo_raw.hpp"
+#include "eurecar_lcmtypes/eurecar/vlp_16_pt.hpp"
 #include <lcm/lcm.h>
 #include <lcm/lcm-cpp.hpp>
+
+#include "sensor/c_vlp_16_hr.h"
 
 class C_LCM_CAM
 {
@@ -60,6 +63,25 @@ public:
     uint8_t raw[1206];
 
     void handleMessage(const lcm::ReceiveBuffer* rbuf, const std::string& chan, const eurecar::velo_raw * msg);
+
+};
+
+class C_LCM_VLP_16_PT
+{
+public:
+    ~C_LCM_VLP_16_PT () {}
+
+    int64_t    utime = 0;
+
+    double     x_data_arr[32][2220] = {{0}};
+
+    double     y_data_arr[32][2220] = {{0}};
+
+    double     z_data_arr[32][2220] = {{0}};
+
+    int32_t    intensity_data_arr[32][2220] = {{0}};
+
+    void handleMessage(const lcm::ReceiveBuffer* rbuf, const std::string& chan, const eurecar::vlp_16_pt * msg);
 
 };
 

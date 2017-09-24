@@ -65,3 +65,12 @@ void C_LCM_VELO_RAW::handleMessage(const lcm::ReceiveBuffer *rbuf, const std::__
     utime = msg->utime;
     memcpy(raw,msg->raw,1206);
 }
+
+void C_LCM_VLP_16_PT::handleMessage(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const eurecar::vlp_16_pt *msg)
+{
+    utime = msg->utime;
+    memcpy(x_data_arr,msg->x_data_arr,sizeof(double)*VLP_16_HR_TOTAL_PACKET_NUMBER*VLP_16_HR_BOLCKS_NUM*VLP_16_HR_LASERS_NUM);
+    memcpy(y_data_arr,msg->y_data_arr,sizeof(double)*VLP_16_HR_TOTAL_PACKET_NUMBER*VLP_16_HR_BOLCKS_NUM*VLP_16_HR_LASERS_NUM);
+    memcpy(z_data_arr,msg->z_data_arr,sizeof(double)*VLP_16_HR_TOTAL_PACKET_NUMBER*VLP_16_HR_BOLCKS_NUM*VLP_16_HR_LASERS_NUM);
+    memcpy(intensity_data_arr,msg->intensity_data_arr,sizeof(int)*VLP_16_HR_TOTAL_PACKET_NUMBER*VLP_16_HR_BOLCKS_NUM*VLP_16_HR_LASERS_NUM);
+}

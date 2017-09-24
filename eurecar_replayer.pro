@@ -47,7 +47,8 @@ HEADERS += \
     3d_view/c_3d_viewer.h \
     sensor/c_vlp_16_hr.h \
     thread/c_t_grab_vlp_16_hr.h \
-    thread/c_t_monitor_lidar.h
+    thread/c_t_monitor_lidar.h \
+    lcm/eurecar_lcmtypes/eurecar/vlp_16_pt.hpp
 
 FORMS += \
         g_main_window.ui

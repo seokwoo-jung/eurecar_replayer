@@ -12,20 +12,25 @@ void C_T_GRAB_VLP_16_HR::SLOT_C_T_MONITOR_LIDAR_2_C_T_GRAB_VLP_16_HR()
     if(!mtx_monitor_lidar.tryLock())
         return;
 
-    c_t_lcmsubscr_lidar->LCMSubscribe(&m_lcm_obj);
-    VLP_16_HR_DATA buffer_rec;
+    c_t_lcmsubscr_lidar->LCMSubscribe();
 
-    memcpy(&buffer_rec,c_lcm_velo_raw_obj_rec.raw,VLP_16_HR_DATA_SIZE);
+//    VLP_16_HR_DATA buffer_rec;
 
-    m_buffer_rec = buffer_rec;
+//    memcpy(&buffer_rec,c_lcm_velo_raw_obj_rec.raw,VLP_16_HR_DATA_SIZE);
 
-    m_rotation_rec_past = m_rotation_rec_current;
-    m_rotation_rec_current = buffer_rec.firing_data[0].rotation;
+//    m_buffer_rec = buffer_rec;
 
-    if(m_rotation_rec_past != m_rotation_rec_current)
-    {
-        this->start();
-    }
+//    m_rotation_rec_past = m_rotation_rec_current;
+//    m_rotation_rec_current = buffer_rec.firing_data[0].rotation;
+
+//    if(m_rotation_rec_past != m_rotation_rec_current)
+//    {
+//        this->start();
+//    }
+
+    this->start();
+
+
     mtx_monitor_lidar.unlock();
 }
 
@@ -33,16 +38,19 @@ void C_T_GRAB_VLP_16_HR::SLOT_C_T_MONITOR_LIDAR_2_C_T_GRAB_VLP_16_HR()
 void C_T_GRAB_VLP_16_HR::run()
 {
     mtx_monitor_lidar.lock();
-    if(!m_rotation_finish)
-    {
-        GrabData(m_buffer_rec);
-    }
-    else
-    {
-        memset(buffer,0,sizeof(VLP_16_HR_DATA)*VLP_16_HR_TOTAL_PACKET_NUMBER);
-        m_rotation_finish = false;
-        GrabData(m_buffer_rec);
-    }
+    GrabData_pt();
+//    if(!m_rotation_finish)
+//    {
+//        GrabData(m_buffer_rec);
+//    }
+//    else
+//    {
+//        memset(buffer,0,sizeof(VLP_16_HR_DATA)*VLP_16_HR_TOTAL_PACKET_NUMBER);
+//        m_rotation_finish = false;
+//        GrabData(m_buffer_rec);
+//    }
+
+    QThread::msleep(30);
     mtx_monitor_lidar.unlock();
 }
 
@@ -135,6 +143,47 @@ bool C_T_GRAB_VLP_16_HR::GrabData(VLP_16_HR_DATA buffer_block)
         count ++;
     }
     return true;
+}
+
+void C_T_GRAB_VLP_16_HR::GrabData_pt()
+{
+    mtx_update_pointcloud.lock();
+
+    memcpy(c_3d_viewer_obj->m_x_data_arr,c_lcm_vlp_16_pt_obj_rec.x_data_arr,sizeof(double)*VLP_16_HR_TOTAL_PACKET_NUMBER*VLP_16_HR_BOLCKS_NUM*VLP_16_HR_LASERS_NUM);
+    memcpy(c_3d_viewer_obj->m_y_data_arr,c_lcm_vlp_16_pt_obj_rec.y_data_arr,sizeof(double)*VLP_16_HR_TOTAL_PACKET_NUMBER*VLP_16_HR_BOLCKS_NUM*VLP_16_HR_LASERS_NUM);
+    memcpy(c_3d_viewer_obj->m_z_data_arr,c_lcm_vlp_16_pt_obj_rec.z_data_arr,sizeof(double)*VLP_16_HR_TOTAL_PACKET_NUMBER*VLP_16_HR_BOLCKS_NUM*VLP_16_HR_LASERS_NUM);
+    memcpy(c_3d_viewer_obj->m_intensity_data_arr,c_lcm_vlp_16_pt_obj_rec.intensity_data_arr,sizeof(int)*VLP_16_HR_TOTAL_PACKET_NUMBER*VLP_16_HR_BOLCKS_NUM*VLP_16_HR_LASERS_NUM);
+
+    PointCloudT cloud_velodyne;
+    long pt_count = 0;
+    for(int k = 0;k < VLP_16_HR_LASERS_NUM;k++){
+        for(int i=0; i< VLP_16_HR_TOTAL_PACKET_NUMBER;i++){
+            for(int j=0; j < VLP_16_HR_BOLCKS_NUM;j++){
+
+                pcl::PointXYZRGBA velodyne_pt;
+
+                velodyne_pt.x = c_3d_viewer_obj->m_x_data_arr[k][(j + i*VLP_16_HR_BOLCKS_NUM)]*0.001;
+                velodyne_pt.y = c_3d_viewer_obj->m_y_data_arr[k][(j + i*VLP_16_HR_BOLCKS_NUM)]*0.001;
+                velodyne_pt.z = c_3d_viewer_obj->m_z_data_arr[k][(j + i*VLP_16_HR_BOLCKS_NUM)]*0.001;
+                int intensity = c_3d_viewer_obj->m_intensity_data_arr[k][(j + i*VLP_16_HR_BOLCKS_NUM)];
+                double pt_dist = sqrt(velodyne_pt.x*velodyne_pt.x + velodyne_pt.y*velodyne_pt.y + velodyne_pt.z*velodyne_pt.z);
+
+                velodyne_pt.r = cv::saturate_cast<uint8_t>(50 + intensity*3);
+                velodyne_pt.g = cv::saturate_cast<uint8_t>(30 + intensity*3);
+                velodyne_pt.b = cv::saturate_cast<uint8_t>(150 + intensity*3);
+
+                if((velodyne_pt.x == 0) && (velodyne_pt.y == 0) && (velodyne_pt.z == 0))
+                {
+                    continue;
+                }
+                pt_count++;
+                cloud_velodyne.points.push_back(velodyne_pt);
+            }
+        }
+    }
+
+    emit SIG_C_T_GRAB_VLP_16_HR_2_MAIN(cloud_velodyne);
+    mtx_update_pointcloud.unlock();
 }
 
 bool C_T_GRAB_VLP_16_HR::GetPauseStatus()

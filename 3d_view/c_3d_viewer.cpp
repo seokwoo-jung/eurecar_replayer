@@ -17,6 +17,7 @@ void C_3D_VIEWER::SetVelodyneData()
 
                 unsigned int distance = (m_vlp_16_hr_data_ary[i].firing_data[j].laser_data[k].distance) * 2;//mm
                 unsigned short rotation = (m_vlp_16_hr_data_ary[i].firing_data[j].rotation);
+                int intensity = (int)(m_vlp_16_hr_data_ary[i].firing_data[j].laser_data[k].intensity);
                 if(distance != 0)
                     xy_deg = rotation / 100.0;
                 z_projected = distance * cos(D2R*(vlp_16_hr_firing_vertical_angle[k]));
@@ -29,6 +30,8 @@ void C_3D_VIEWER::SetVelodyneData()
 
                 m_z_data_arr[k][(j + i*VLP_16_HR_BOLCKS_NUM)] =
                     distance * sin(D2R*(vlp_16_hr_firing_vertical_angle[k]));
+
+                m_intensity_data_arr[k][(j + i*VLP_16_HR_BOLCKS_NUM)] = intensity;
             }
         }
     }

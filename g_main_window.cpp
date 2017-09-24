@@ -178,7 +178,7 @@ void G_MAIN_WINDOW::SLOT_C_T_MONITOR_2_MAIN()
     if(!mtx_monitor.tryLock())
         return;
 
-    c_t_lcmsubscr_cam->LCMSubscribe(&m_lcm_obj);
+    c_t_lcmsubscr_cam->LCMSubscribe();
 
     m_timestamp = m_lcm_cam_obj_recv.utime_cam[0];
 
@@ -282,6 +282,7 @@ void G_MAIN_WINDOW::on_pushButton_start_load_clicked()
         }
     }
 
+    c_t_lcmsubscr_cam->SetLCMObj(&m_lcm_obj);
     c_t_monitor->start();
     c_t_grab_vlp_16_hr->c_t_monitor_lidar->start();
 }

@@ -14,7 +14,8 @@ public:
     ~C_T_LCMSUBSCR() {}
 
     lcm::LCM *m_lcm_obj;
-    void LCMSubscribe(lcm::LCM *_lcm_obj);
+    void LCMSubscribe();
+    void SetLCMObj(lcm::LCM *_lcm_obj);
     void LCMHandle();
 
 
