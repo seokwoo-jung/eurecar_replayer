@@ -5,6 +5,8 @@ G_MAIN_WINDOW::G_MAIN_WINDOW(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::G_MAIN_WINDOW)
 {
+    VTK_MODULE_INIT(vtkRenderingOpenGL2);
+
     // Register metatype
     qRegisterMetaType<cv::Mat>("cv::Mat");
     qRegisterMetaType<PointCloudT>("PointCloudT");
@@ -29,6 +31,7 @@ G_MAIN_WINDOW::G_MAIN_WINDOW(QWidget *parent) :
     connect(c_t_grab_vlp_16_hr,SIGNAL(SIG_C_T_GRAB_VLP_16_HR_2_MAIN(PointCloudT)),this,SLOT(SLOT_C_T_GRAB_VLP_16_HR_2_MAIN(PointCloudT)));
     connect(this,SIGNAL(SIG_MAIN_2_C_T_GRAB_VLP_16_HR_PAUSE(bool)),c_t_grab_vlp_16_hr,SLOT(SLOT_MAIN_2_C_T_GRAB_VLP_16_HR_PAUSE(bool)));
 
+    // Seting QVTK widget and cloud
     ui->qvtkWidget_lidar->SetRenderWindow(c_3d_viewer_obj->viewer->getRenderWindow());
     c_3d_viewer_obj->viewer->setupInteractor(ui->qvtkWidget_lidar->GetInteractor(),ui->qvtkWidget_lidar->GetRenderWindow());
     c_3d_viewer_obj->viewer->setBackgroundColor(0,0,0);
@@ -36,6 +39,21 @@ G_MAIN_WINDOW::G_MAIN_WINDOW(QWidget *parent) :
     c_3d_viewer_obj->viewer->addPointCloud(c_3d_viewer_obj->cloud,"cloud");
     c_3d_viewer_obj->viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,2,"cloud");
 
+
+    // Import veloster 3ds model
+    vtkSmartPointer<vtk3DSImporter> veloster_importer(vtkSmartPointer<vtk3DSImporter>::New());
+    veloster_importer->SetRenderWindow(c_3d_viewer_obj->viewer->getRenderWindow());
+    veloster_importer->SetFileName("/home/jung/git/eurecar_replayer/3d_view/model/veloster.3ds");
+    veloster_importer->Read();
+    c_3d_viewer_obj->viewer->getRenderWindow()->AddRenderer(veloster_importer->GetRenderer());
+
+    vtkSmartPointer<vtkLight> light (vtkSmartPointer<vtkLight>::New());
+    light->SetLightTypeToHeadlight();
+    light->SetColor(1, 1, 1);
+    light->SetDiffuseColor(1.0, 1.0, 1.0);
+    light->SetIntensity(10);
+    light->SetAmbientColor(2.0, 2.0, 2.0);
+    veloster_importer->GetRenderer()->AddLight(light);
 }
 
 G_MAIN_WINDOW::~G_MAIN_WINDOW()

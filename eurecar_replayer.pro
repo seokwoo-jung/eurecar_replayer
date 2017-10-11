@@ -116,6 +116,7 @@ LIBS += -L/usr/local/lib \
     -lvtksqlite-8.0 \
     -lvtkhdf5_hl-8.0 \
     -lvtkIOImage-8.0 \
+    -lvtkIOImport-8.0 \
     -lvtkIOMovie-8.0 \
     -lvtkIOVideo-8.0 \
     -lvtkIOXML-8.0 \

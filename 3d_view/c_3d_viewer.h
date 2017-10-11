@@ -12,6 +12,11 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkCubeSource.h>
+#include <vtkVRMLImporter.h>
+#include <vtk3DSImporter.h>
+#include <vtkSmartPointer.h>
+#include <vtkMapper.h>
+#include <vtkLight.h>
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
