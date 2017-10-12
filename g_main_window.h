@@ -39,6 +39,7 @@
 #include "thread/c_t_lcmsubscr.h"
 #include "thread/c_t_monitor.h"
 #include "thread/c_t_grab_vlp_16_hr.h"
+#include "thread/c_t_sensorfusion.h"
 #include "3d_view/c_3d_viewer.h"
 
 #include "lcm/c_lcm_handler.h"
@@ -77,11 +78,13 @@ private:
     C_T_IMGLOAD* c_t_imgload;
     C_T_LCMSUBSCR* c_t_lcmsubscr_cam = new C_T_LCMSUBSCR;
     C_T_GRAB_VLP_16_HR* c_t_grab_vlp_16_hr;
+    C_T_SENSORFUSION* c_t_sensorfusion = new C_T_SENSORFUSION;
 
 private:
     QMutex mtx_monitor;
     QMutex mtx_grab_cam[8];
     QMutex mtx_grab_lidar;
+    QMutex mtx_sensor_fusion;
 
     lcm::LCM m_lcm_obj;
     C_LCM_CAM m_lcm_cam_obj_recv;
@@ -103,6 +106,16 @@ private:
 
     C_3D_VIEWER* c_3d_viewer_obj = new C_3D_VIEWER;
 
+    PointCloudT::Ptr m_cloud_disp;
+    PointCloudT m_cloud_for_sensor_fusion;
+
+    cv::Mat m_sensor_fusion_img;
+    QImage m_sensor_fusion_img_q;
+    QPixmap m_sensor_fusion_img_p;
+    QGraphicsScene *m_sensor_fusion_img_scene = new QGraphicsScene;
+
+    vector<cv::Point> m_fusion_img_coord_list;
+    vector<cv::Point3f> m_fusion_real_coord_list;
 
 public slots:
     void SLOT_C_T_MONITOR_2_MAIN();
@@ -114,7 +127,9 @@ public slots:
     void SLOT_C_T_IMGLOAD_2_MAIN_6(cv::Mat _recv_img);
     void SLOT_C_T_IMGLOAD_2_MAIN_7(cv::Mat _recv_img);
     void SLOT_C_T_IMGLOAD_2_MAIN_8(cv::Mat _recv_img);
-    void SLOT_C_T_GRAB_VLP_16_HR_2_MAIN(PointCloudT _cloud);
+    void SLOT_C_T_GRAB_VLP_16_HR_2_MAIN(PointCloudT _cloud,PointCloudT _cloud_disp);
+    void SLOT_C_T_SENSORFUSION_2_MAIN(cv::Mat _recv_img, vector<cv::Point> _img_coord, vector<cv::Point3f> _real_coord);
+
 
 signals:
     void SIG_MAIN_2_C_T_IMGLOAD_1(string);
@@ -126,6 +141,7 @@ signals:
     void SIG_MAIN_2_C_T_IMGLOAD_7(string);
     void SIG_MAIN_2_C_T_IMGLOAD_8(string);
     void SIG_MAIN_2_C_T_GRAB_VLP_16_HR_PAUSE(bool _pause_status);
+    void SIG_MAIN_2_C_T_SENSORFUSION(cv::Mat, PointCloudT);
 
 };
 

@@ -10,6 +10,8 @@ G_MAIN_WINDOW::G_MAIN_WINDOW(QWidget *parent) :
     // Register metatype
     qRegisterMetaType<cv::Mat>("cv::Mat");
     qRegisterMetaType<PointCloudT>("PointCloudT");
+    qRegisterMetaType<vector<cv::Point>>("vector<cv::Point>");
+    qRegisterMetaType<vector<cv::Point3f>>("vector<cv::Point3f>");
 
     ui->setupUi(this);
 
@@ -28,16 +30,26 @@ G_MAIN_WINDOW::G_MAIN_WINDOW(QWidget *parent) :
     m_disp_size.height = ui->graphicsView_cam_1->geometry().height();
 
     connect(c_t_monitor,SIGNAL(SIG_C_T_MONITOR_2_MAIN()),this,SLOT(SLOT_C_T_MONITOR_2_MAIN()));
-    connect(c_t_grab_vlp_16_hr,SIGNAL(SIG_C_T_GRAB_VLP_16_HR_2_MAIN(PointCloudT)),this,SLOT(SLOT_C_T_GRAB_VLP_16_HR_2_MAIN(PointCloudT)));
+    connect(c_t_grab_vlp_16_hr,SIGNAL(SIG_C_T_GRAB_VLP_16_HR_2_MAIN(PointCloudT,PointCloudT)),this,SLOT(SLOT_C_T_GRAB_VLP_16_HR_2_MAIN(PointCloudT,PointCloudT)));
     connect(this,SIGNAL(SIG_MAIN_2_C_T_GRAB_VLP_16_HR_PAUSE(bool)),c_t_grab_vlp_16_hr,SLOT(SLOT_MAIN_2_C_T_GRAB_VLP_16_HR_PAUSE(bool)));
+    connect(this,SIGNAL(SIG_MAIN_2_C_T_SENSORFUSION(cv::Mat,PointCloudT)),c_t_sensorfusion,SLOT(SLOT_MAIN_2_C_T_SENSORFUSION(cv::Mat,PointCloudT)));
+    connect(c_t_sensorfusion,SIGNAL(SIG_C_T_SENSORFUSION_2_MAIN(cv::Mat,vector<cv::Point>,vector<cv::Point3f>)),this,SLOT(SLOT_C_T_SENSORFUSION_2_MAIN(cv::Mat,vector<cv::Point>,vector<cv::Point3f>)));
+
+    if(ui->checkBox_sensor_fusion->isChecked())
+    {
+        string calib_data_path = "/home/jung/git/eurecar_replayer/sensor/fusion_data/cam3_w_vlp_16_hr.xml";
+        c_t_sensorfusion->UpdateCalibrationData(calib_data_path);
+    }
 
     // Seting QVTK widget and cloud
+    m_cloud_disp.reset(new PointCloudT);
     ui->qvtkWidget_lidar->SetRenderWindow(c_3d_viewer_obj->viewer->getRenderWindow());
     c_3d_viewer_obj->viewer->setupInteractor(ui->qvtkWidget_lidar->GetInteractor(),ui->qvtkWidget_lidar->GetRenderWindow());
     c_3d_viewer_obj->viewer->setBackgroundColor(0,0,0);
     c_3d_viewer_obj->viewer->addCoordinateSystem(1.0);
-    c_3d_viewer_obj->viewer->addPointCloud(c_3d_viewer_obj->cloud,"cloud");
-    c_3d_viewer_obj->viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,2,"cloud");
+//    c_3d_viewer_obj->viewer->addPointCloud(c_3d_viewer_obj->cloud,"cloud");
+    c_3d_viewer_obj->viewer->addPointCloud(m_cloud_disp,"cloud_disp");
+    c_3d_viewer_obj->viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,2,"cloud_disp");
 
 
     // Import veloster 3ds model
@@ -108,6 +120,7 @@ void G_MAIN_WINDOW::SLOT_C_T_IMGLOAD_2_MAIN_3(cv::Mat _recv_img)
     m_disp_img_scene[2].addPixmap(m_disp_img_p[2]);
     m_graphicsview_list[2]->setScene(&m_disp_img_scene[2]);
     m_graphicsview_list[2]->show();
+
     mtx_grab_cam[2].unlock();
 }
 
@@ -235,17 +248,45 @@ void G_MAIN_WINDOW::SLOT_C_T_MONITOR_2_MAIN()
     mtx_monitor.unlock();
 }
 
-void G_MAIN_WINDOW::SLOT_C_T_GRAB_VLP_16_HR_2_MAIN(PointCloudT _cloud)
+void G_MAIN_WINDOW::SLOT_C_T_GRAB_VLP_16_HR_2_MAIN(PointCloudT _cloud, PointCloudT _cloud_disp)
 {
     mtx_grab_lidar.lock();
     c_t_grab_vlp_16_hr->mtx_update_pointcloud.lock();
     *(c_3d_viewer_obj->cloud) = _cloud;
-    c_3d_viewer_obj->viewer->updatePointCloud(c_3d_viewer_obj->cloud,"cloud");
+    m_cloud_for_sensor_fusion = *(c_3d_viewer_obj->cloud);
+    *m_cloud_disp = _cloud_disp;
+    c_3d_viewer_obj->viewer->updatePointCloud(m_cloud_disp,"cloud_disp");
     ui->qvtkWidget_lidar->update();
+
+    if(ui->checkBox_sensor_fusion->isChecked())
+    {
+        if(!m_ori_img[2].empty())
+        {
+            emit SIG_MAIN_2_C_T_SENSORFUSION(m_ori_img[2],m_cloud_for_sensor_fusion);
+        }
+    }
+
     c_t_grab_vlp_16_hr->mtx_update_pointcloud.unlock();
     mtx_grab_lidar.unlock();
 }
 
+void G_MAIN_WINDOW::SLOT_C_T_SENSORFUSION_2_MAIN(cv::Mat _recv_img, vector<cv::Point> _img_coord, vector<cv::Point3f> _real_coord)
+{
+    mtx_sensor_fusion.lock();
+    _recv_img.copyTo(m_sensor_fusion_img);
+    m_fusion_img_coord_list = _img_coord;
+    m_fusion_real_coord_list = _real_coord;
+
+    m_sensor_fusion_img_q = Mat2QImage(m_sensor_fusion_img);
+    m_sensor_fusion_img_p.convertFromImage(m_sensor_fusion_img_q);
+    m_sensor_fusion_img_scene->clear();
+    m_sensor_fusion_img_scene->addPixmap(m_sensor_fusion_img_p);
+
+    ui->graphicsView_sensor_fusion->setScene(m_sensor_fusion_img_scene);
+    ui->graphicsView_sensor_fusion->show();
+
+    mtx_sensor_fusion.unlock();
+}
 
 void G_MAIN_WINDOW::on_pushButton_start_load_clicked()
 {

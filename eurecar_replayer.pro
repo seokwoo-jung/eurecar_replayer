@@ -33,7 +33,8 @@ SOURCES += \
     thread/c_t_lcmsubscr.cpp \
     3d_view/c_3d_viewer.cpp \
     thread/c_t_grab_vlp_16_hr.cpp \
-    thread/c_t_monitor_lidar.cpp
+    thread/c_t_monitor_lidar.cpp \
+    thread/c_t_sensorfusion.cpp
 
 HEADERS += \
         g_main_window.h \
@@ -48,7 +49,8 @@ HEADERS += \
     sensor/c_vlp_16_hr.h \
     thread/c_t_grab_vlp_16_hr.h \
     thread/c_t_monitor_lidar.h \
-    lcm/eurecar_lcmtypes/eurecar/vlp_16_pt.hpp
+    lcm/eurecar_lcmtypes/eurecar/vlp_16_pt.hpp \
+    thread/c_t_sensorfusion.h
 
 FORMS += \
         g_main_window.ui
@@ -83,6 +85,13 @@ LIBS += -L/usr/lib/x86_64-linux-gnu \
     -lboost_filesystem \
     -lglog \
     -lgflags
+# --------------------------------------------------
+
+# armadillo ----------------------------------------
+INCLUDEPATH += /usr/include
+
+LIBS += -L/usr/lib/x86_64-linux-gnu \
+    -larmadillo
 # --------------------------------------------------
 
 

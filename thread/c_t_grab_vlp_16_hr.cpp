@@ -39,17 +39,6 @@ void C_T_GRAB_VLP_16_HR::run()
 {
     mtx_monitor_lidar.lock();
     GrabData_pt();
-//    if(!m_rotation_finish)
-//    {
-//        GrabData(m_buffer_rec);
-//    }
-//    else
-//    {
-//        memset(buffer,0,sizeof(VLP_16_HR_DATA)*VLP_16_HR_TOTAL_PACKET_NUMBER);
-//        m_rotation_finish = false;
-//        GrabData(m_buffer_rec);
-//    }
-
     QThread::msleep(30);
     mtx_monitor_lidar.unlock();
 }
@@ -102,6 +91,7 @@ bool C_T_GRAB_VLP_16_HR::GrabData(VLP_16_HR_DATA buffer_block)
         mtx_update_pointcloud.lock();
 
         PointCloudT cloud_velodyne;
+        PointCloudT cloud_disp;
 
         memcpy(c_3d_viewer_obj->m_vlp_16_hr_data_ary, buffer, sizeof(VLP_16_HR_DATA)*VLP_16_HR_TOTAL_PACKET_NUMBER);
         c_3d_viewer_obj->SetVelodyneData();
@@ -132,7 +122,7 @@ bool C_T_GRAB_VLP_16_HR::GrabData(VLP_16_HR_DATA buffer_block)
                 }
             }
         }
-        emit SIG_C_T_GRAB_VLP_16_HR_2_MAIN(cloud_velodyne);
+        emit SIG_C_T_GRAB_VLP_16_HR_2_MAIN(cloud_velodyne,cloud_disp);
         count = 0;
         mtx_update_pointcloud.unlock();
         QThread::usleep(10);
@@ -155,6 +145,8 @@ void C_T_GRAB_VLP_16_HR::GrabData_pt()
     memcpy(c_3d_viewer_obj->m_intensity_data_arr,c_lcm_vlp_16_pt_obj_rec.intensity_data_arr,sizeof(int)*VLP_16_HR_TOTAL_PACKET_NUMBER*VLP_16_HR_BOLCKS_NUM*VLP_16_HR_LASERS_NUM);
 
     PointCloudT cloud_velodyne;
+    PointCloudT cloud_disp;
+
     long pt_count = 0;
     for(int k = 0;k < VLP_16_HR_LASERS_NUM;k++){
         for(int i=0; i< VLP_16_HR_TOTAL_PACKET_NUMBER;i++){
@@ -166,23 +158,37 @@ void C_T_GRAB_VLP_16_HR::GrabData_pt()
                 velodyne_pt.y = c_3d_viewer_obj->m_y_data_arr[k][(j + i*VLP_16_HR_BOLCKS_NUM)]*0.001;
                 velodyne_pt.z = c_3d_viewer_obj->m_z_data_arr[k][(j + i*VLP_16_HR_BOLCKS_NUM)]*0.001;
                 int intensity = c_3d_viewer_obj->m_intensity_data_arr[k][(j + i*VLP_16_HR_BOLCKS_NUM)];
-                double pt_dist = sqrt(velodyne_pt.x*velodyne_pt.x + velodyne_pt.y*velodyne_pt.y + velodyne_pt.z*velodyne_pt.z);
-
+//                double pt_dist = sqrt(velodyne_pt.x*velodyne_pt.x + velodyne_pt.y*velodyne_pt.y + velodyne_pt.z*velodyne_pt.z);
                 velodyne_pt.r = cv::saturate_cast<uint8_t>(50 + intensity*3);
                 velodyne_pt.g = cv::saturate_cast<uint8_t>(30 + intensity*3);
                 velodyne_pt.b = cv::saturate_cast<uint8_t>(150 + intensity*3);
+                cloud_velodyne.points.push_back(velodyne_pt);
 
                 if((velodyne_pt.x == 0) && (velodyne_pt.y == 0) && (velodyne_pt.z == 0))
                 {
                     continue;
                 }
+
+                // pitch conpensate
+                double new_y = 0.0;
+                double new_z = 0.0;
+
+                new_y = velodyne_pt.y*cos((double)VLP_16_PITCH) - velodyne_pt.z*sin((double)VLP_16_PITCH);
+                new_z = velodyne_pt.y*sin((double)VLP_16_PITCH) + velodyne_pt.z*cos((double)VLP_16_PITCH);
+
+                // translation
+                velodyne_pt.x = velodyne_pt.x + (double)VLP_16_OFFSET_X;
+                velodyne_pt.y = new_y + (double)VLP_16_OFFSET_Y;
+                velodyne_pt.z = new_z + (double)VLP_16_OFFSET_Z;
+                cloud_disp.points.push_back(velodyne_pt);
+
                 pt_count++;
-                cloud_velodyne.points.push_back(velodyne_pt);
+
             }
         }
     }
 
-    emit SIG_C_T_GRAB_VLP_16_HR_2_MAIN(cloud_velodyne);
+    emit SIG_C_T_GRAB_VLP_16_HR_2_MAIN(cloud_velodyne,cloud_disp);
     mtx_update_pointcloud.unlock();
 }
 

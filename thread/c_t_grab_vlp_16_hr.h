@@ -39,6 +39,11 @@
 #include "thread/c_t_monitor_lidar.h"
 #include "thread/c_t_lcmsubscr.h"
 
+#define VLP_16_OFFSET_X -0.27
+#define VLP_16_OFFSET_Y 1.5
+#define VLP_16_OFFSET_Z 0
+#define VLP_16_PITCH -0.1222
+
 using namespace std;
 
 class C_T_GRAB_VLP_16_HR : public QThread {
@@ -100,7 +105,7 @@ private:
 
 
 signals:
-   void SIG_C_T_GRAB_VLP_16_HR_2_MAIN(PointCloudT);
+   void SIG_C_T_GRAB_VLP_16_HR_2_MAIN(PointCloudT,PointCloudT);
 
 public slots:
    void SLOT_MAIN_2_C_T_GRAB_VLP_16_HR_PAUSE(bool _pause_status);
