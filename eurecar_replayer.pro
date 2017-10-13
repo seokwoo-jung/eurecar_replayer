@@ -34,7 +34,9 @@ SOURCES += \
     3d_view/c_3d_viewer.cpp \
     thread/c_t_grab_vlp_16_hr.cpp \
     thread/c_t_monitor_lidar.cpp \
-    thread/c_t_sensorfusion.cpp
+    thread/c_t_sensorfusion.cpp \
+    imgproc/drivenet_common/common.cpp \
+    imgproc/drivenet_common/DriveNet.cpp
 
 HEADERS += \
         g_main_window.h \
@@ -50,7 +52,9 @@ HEADERS += \
     thread/c_t_grab_vlp_16_hr.h \
     thread/c_t_monitor_lidar.h \
     lcm/eurecar_lcmtypes/eurecar/vlp_16_pt.hpp \
-    thread/c_t_sensorfusion.h
+    thread/c_t_sensorfusion.h \
+    imgproc/drivenet_common/common.hpp \
+    imgproc/drivenet_common/DriveNet.hpp
 
 FORMS += \
         g_main_window.ui
@@ -93,6 +97,22 @@ INCLUDEPATH += /usr/include
 LIBS += -L/usr/lib/x86_64-linux-gnu \
     -larmadillo
 # --------------------------------------------------
+
+# Driveworks ----------------------------------------
+INCLUDEPATH += /usr/local/driveworks/include
+
+LIBS += -L/usr/local/driveworks/lib \
+    -ldriveworks \
+    -lnvinfer
+# --------------------------------------------------
+
+# Driveworks ----------------------------------------
+INCLUDEPATH += /usr/local/cuda/include
+
+LIBS += -L/usr/local/cuda/lib64 \
+    -lcudart
+# --------------------------------------------------
+
 
 
 # vtk && pcl --------------------------------------
