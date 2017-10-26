@@ -1,6 +1,8 @@
 #ifndef G_MAIN_WINDOW_H
 #define G_MAIN_WINDOW_H
 
+#include <GL/glew.h>
+
 // Qt header
 #include <QMainWindow>
 #include <QDialog>
@@ -44,6 +46,11 @@
 
 #include "lcm/c_lcm_handler.h"
 
+
+// drivenet
+#include "imgproc/drivenet_common/common.hpp"
+#include "imgproc/drivenet_common/DriveNet.hpp"
+
 using namespace std;
 
 namespace Ui {
@@ -68,6 +75,8 @@ private slots:
     void on_pushButton_save_img_clicked();
 
     void on_pushButton_save_lidar_data_clicked();
+
+    void on_pushButton_init_drivenet_clicked();
 
 private:
     Ui::G_MAIN_WINDOW *ui;

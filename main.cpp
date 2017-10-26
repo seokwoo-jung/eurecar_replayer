@@ -1,3 +1,4 @@
+#include <GL/glew.h>
 #include "g_main_window.h"
 #include <QApplication>
 

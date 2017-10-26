@@ -428,3 +428,181 @@ void G_MAIN_WINDOW::on_pushButton_save_lidar_data_clicked()
     fs << "pt_data_b" << save_pt_data_b;
     fs.release();
 }
+
+void G_MAIN_WINDOW::on_pushButton_init_drivenet_clicked()
+{
+    dwStatus status;
+    dwStatus result = DW_SUCCESS;
+
+    initSdk(&gSdk);
+
+    // Setting virtual camera ----------------------------------------------------
+    dwSALHandle_t sal = DW_NULL_HANDLE;
+    dwSensorHandle_t camera = DW_NULL_HANDLE;
+    dwRawPipelineHandle_t gRawPipeline              = DW_NULL_HANDLE;
+
+    // init Drivenet
+    DriveNet drivenet(gSdk);
+
+    // Load sample image
+    cv::Mat ori_img = cv::imread("/home/jung/Documents/1507702514030235.jpg");
+
+    cv::cvtColor(ori_img,ori_img,CV_BGR2RGB);
+
+    dwImageCPU  rawImageCPU;
+    dwImageCUDA gRGBCudaImage;
+    dwImageCUDA gRCBImage{};
+    dwImageCUDA gRGBAImage{};
+
+
+    dwImageProperties rawImageCPU_prop;
+
+    rawImageCPU_prop.type = DW_IMAGE_CPU;
+    rawImageCPU_prop.pxlFormat = DW_IMAGE_RGB;
+    rawImageCPU_prop.planeCount = 1;
+    rawImageCPU_prop.width = (uint32_t)ori_img.cols;
+    rawImageCPU_prop.height = (uint32_t)ori_img.rows;
+    rawImageCPU_prop.pxlType = DW_TYPE_UINT8;
+
+    dwImageProperties cudaImageRGB_prop;
+
+    cudaImageRGB_prop.type = DW_IMAGE_CUDA;
+    cudaImageRGB_prop.pxlFormat = DW_IMAGE_RGB;
+    cudaImageRGB_prop.planeCount = 1;
+    cudaImageRGB_prop.width = (uint32_t)ori_img.cols;
+    cudaImageRGB_prop.height = (uint32_t)ori_img.rows;
+    cudaImageRGB_prop.pxlType = DW_TYPE_UINT8;
+
+    dwImageProperties cudaImage_prop{};
+
+    cudaImage_prop.type = DW_IMAGE_CUDA;
+    cudaImage_prop.pxlFormat = DW_IMAGE_RCB;
+    cudaImage_prop.planeCount = 3;
+    cudaImage_prop.width = (uint32_t)ori_img.cols;
+    cudaImage_prop.height = (uint32_t)ori_img.rows;
+    cudaImage_prop.pxlType = DW_TYPE_UINT8;
+
+    dwImageProperties rgbaImage_prop{};
+
+    rgbaImage_prop.type = DW_IMAGE_CUDA;
+    rgbaImage_prop.pxlFormat = DW_IMAGE_RGBA;
+    rgbaImage_prop.planeCount = 1;
+    rgbaImage_prop.width = (uint32_t)ori_img.cols;
+    rgbaImage_prop.height = (uint32_t)ori_img.rows;
+    rgbaImage_prop.pxlType = DW_TYPE_UINT8;
+
+    dwVector2ui cam_resol;
+    cam_resol.x = 960;
+    cam_resol.y = 604;
+    dwCameraProperties camera_props;
+    camera_props.cameraType = DW_CAMERA_GENERIC;
+    camera_props.framerate = 30;
+    camera_props.siblings = 0;
+    camera_props.resolution = cam_resol;
+    camera_props.outputTypes = DW_CAMERA_RAW_IMAGE;
+
+    dwSensorHandle_t gCameraSensor                  = DW_NULL_HANDLE;
+    
+
+    bool sensorsInitialized = initSensors(&sal, &gCameraSensor, &rawImageCPU_prop, &camera_props, gSdk);
+
+    status = dwRawPipeline_initialize(&gRawPipeline, rawImageCPU_prop, camera_props, gSdk);
+    if(status != DW_SUCCESS)
+    {
+        cout << "dw Raw Pipeline initialize failed" << dwGetStatusName(status) << endl;
+    }
+    else{
+        cout << "dw Raw Pipeline initialize success" << endl;
+    }
+
+    status = dwImageCPU_create(&rawImageCPU,(const dwImageProperties*)&rawImageCPU_prop);
+
+    if(status != DW_SUCCESS)
+    {
+        cout << "dw ImageCPU create error" << endl;
+    }
+    else{
+        cout << "dw ImageCPU create success" << endl;
+    }
+
+
+    status = dwImageCUDA_create(&gRCBImage,(const dwImageProperties*)&cudaImage_prop,DW_IMAGE_CUDA_PITCH);
+
+    if(status != DW_SUCCESS)
+    {
+        cout << "dw Image CUDA create error" << endl;
+    }
+    else{
+        cout << "dw Image CUDA create success" << endl;
+    }
+
+    status = dwImageCUDA_create(&gRGBAImage,(const dwImageProperties*)&rgbaImage_prop,DW_IMAGE_CUDA_PITCH);
+
+    if(status != DW_SUCCESS)
+    {
+        cout << "dw Image RGBA create error" << endl;
+    }
+    else{
+        cout << "dw Image RGBA create success" << endl;
+    }
+
+
+    memcpy(rawImageCPU.data[0],ori_img.data, ori_img.total()*ori_img.channels());
+
+    dwImageStreamerHandle_t gInput2cuda             = DW_NULL_HANDLE;
+    dwImageStreamerHandle_t gCuda2gl                = DW_NULL_HANDLE;
+
+    result = result != DW_SUCCESS ? result : dwImageStreamer_initialize(&gInput2cuda, &rawImageCPU_prop, DW_IMAGE_CUDA, gSdk);
+    result = result != DW_SUCCESS ? result : dwImageStreamer_initialize(&gCuda2gl, &rgbaImage_prop, DW_IMAGE_GL, gSdk);
+    if (result != DW_SUCCESS) {
+        std::cerr << "Image streamer initialization failed: " << dwGetStatusName(result) << std::endl;
+        return;
+    }
+
+    dwImageFormatConverterHandle_t gConvert2RGBA    = DW_NULL_HANDLE;
+    dwImageFormatConverterHandle_t gConvert2CUDA    = DW_NULL_HANDLE;
+
+    // init format converter to convert from RCB->RGBA
+    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvert2RGBA, &cudaImage_prop, &rgbaImage_prop, gSdk);
+    if (result != DW_SUCCESS) {
+        std::cerr << "Image format converter initialization failed: " << dwGetStatusName(result) << std::endl;
+        return;
+    }
+
+    // init format converter to convert from RGB CUDA ->RCB
+    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvert2CUDA, &cudaImageRGB_prop, &cudaImage_prop, gSdk);
+    if (result != DW_SUCCESS) {
+        std::cerr << "Image format converter initialization failed(CUDA): " << dwGetStatusName(result) << std::endl;
+        return;
+    }
+
+
+    result = dwImageStreamer_postCPU(&rawImageCPU, gInput2cuda);
+    if (result != DW_SUCCESS) {
+        std::cout << "Cannot post raw image: " << dwGetStatusName(result) << std::endl;
+        return;
+    }
+
+    dwImageCUDA *rawImageCUDA;
+
+    result = dwImageStreamer_receiveCUDA(&rawImageCUDA, 10000, gInput2cuda);
+    if (result != DW_SUCCESS) {
+        std::cout << "Cannot receive CUDA Image " << dwGetStatusName(result) << std::endl;
+        return;
+    }
+
+    cudaStream_t g_cudaStream  = 0;
+
+    dwImageCUDA *rcbImageCUDA;
+    
+    status = dwImageFormatConverter_copyConvertCUDA(rcbImageCUDA,rawImageCUDA,gConvert2CUDA,g_cudaStream);
+
+    if(status != DW_SUCCESS)
+    {
+        cout << "dw CUDA format convert error" << endl;
+    }
+    else{
+        cout << "dw CUDA format convert success" << endl;
+    }
+
+}

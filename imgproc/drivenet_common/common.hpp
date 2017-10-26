@@ -30,10 +30,11 @@
 
 #ifndef DRIVENET_COMNMON_METHODS_H_
 #define DRIVENET_COMNMON_METHODS_H_
+#include <GL/glew.h>
 
 #include <signal.h>
 
-#include <cstring>
+#include <string>
 #include <sstream>
 #include <iomanip>
 #include <iostream>
@@ -43,10 +44,10 @@
 #include <thread>
 
 // SAMPLE COMMON
-// #include <common/SampleFramework.hpp>
-// #include <common/ConsoleColor.hpp>
-// #include <common/DataPath.hpp>
-// #include <common/ProgramArguments.hpp>
+ #include "SampleFramework.hpp"
+ #include "ConsoleColor.hpp"
+ #include "DataPath.hpp.in"
+ #include "ProgramArguments.hpp"
 
 // CORE
 #include <dw/core/Context.h>
@@ -66,7 +67,8 @@
 // RCCB
 #include <dw/raw/RawPipeline.h>
 
-
+#ifndef DRIVENET_MACRO
+#define DRIVENET_MACRO
 //------------------------------------------------------------------------------
 // Variables
 //------------------------------------------------------------------------------
@@ -79,16 +81,30 @@ extern dwRenderBufferHandle_t gLineBuffer;
 extern dwSALHandle_t gSal;
 extern dwSensorHandle_t gCameraSensor;
 extern dwRawPipelineHandle_t gRawPipeline;
-extern dwImageProperties gRCBProperties;
+//extern dwImageProperties gRCBProperties;
 
 // Sample variables
-extern std::string gInputType;
+//extern std::string gInputType;
 
 // Maximum number of colors for rendering bounding boxes
 extern const uint32_t gMaxBoxColors;
 
 // Colors for rendering bounding boxes
 extern float32_t gBoxColors[][4];
+
+
+extern dwImageCUDA gRCBImage;
+
+extern dwImageCUDA gRGBAImage;
+extern dwImageProperties gRCBProperties;
+
+extern dwImageStreamerHandle_t gCuda2gl;
+extern dwImageStreamerHandle_t gInput2cuda;
+extern dwImageFormatConverterHandle_t gConvert2RGBA;
+
+// Sample variables
+extern dwRect gScreenRectangle;
+#endif
 
 //------------------------------------------------------------------------------
 // Methods

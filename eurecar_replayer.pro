@@ -35,8 +35,19 @@ SOURCES += \
     thread/c_t_grab_vlp_16_hr.cpp \
     thread/c_t_monitor_lidar.cpp \
     thread/c_t_sensorfusion.cpp \
+    imgproc/drivenet_common/ConsoleColor.cpp \
+    imgproc/drivenet_common/GPUProgram.cpp \
+    imgproc/drivenet_common/Grid.cpp \
+    imgproc/drivenet_common/MathUtils.cpp \
+    imgproc/drivenet_common/MouseView3D.cpp \
+    imgproc/drivenet_common/ProfilerCUDA.cpp \
+    imgproc/drivenet_common/Shader.cpp \
+    imgproc/drivenet_common/VBO.cpp \
     imgproc/drivenet_common/common.cpp \
-    imgproc/drivenet_common/DriveNet.cpp
+    imgproc/drivenet_common/DriveNet.cpp \
+    imgproc/drivenet_common/ProgramArguments.cpp \
+    imgproc/drivenet_common/SampleFramework.cpp \
+    imgproc/drivenet_common/WindowGLFW.cpp
 
 HEADERS += \
         g_main_window.h \
@@ -54,7 +65,28 @@ HEADERS += \
     lcm/eurecar_lcmtypes/eurecar/vlp_16_pt.hpp \
     thread/c_t_sensorfusion.h \
     imgproc/drivenet_common/common.hpp \
-    imgproc/drivenet_common/DriveNet.hpp
+    imgproc/drivenet_common/DriveNet.hpp \
+    imgproc/drivenet_common/ProgramArguments.hpp \
+    imgproc/drivenet_common/SampleFramework.hpp \
+    imgproc/drivenet_common/common.hpp \
+    imgproc/drivenet_common/ConsoleColor.hpp \
+    imgproc/drivenet_common/CudaTimer.hpp \
+    imgproc/drivenet_common/DataPath.hpp.in \
+    imgproc/drivenet_common/DriveNet.hpp \
+    imgproc/drivenet_common/GPUProgram.hpp \
+    imgproc/drivenet_common/Grid.hpp \
+    imgproc/drivenet_common/Mat4.hpp \
+    imgproc/drivenet_common/MathUtils.hpp \
+    imgproc/drivenet_common/MouseView3D.hpp \
+    imgproc/drivenet_common/ProfilerCUDA.hpp \
+    imgproc/drivenet_common/ProgramArguments.hpp \
+    imgproc/drivenet_common/SampleFramework.hpp \
+    imgproc/drivenet_common/Shader.hpp \
+    imgproc/drivenet_common/StatsCounter.hpp \
+    imgproc/drivenet_common/VBO.hpp \
+    imgproc/drivenet_common/Window.hpp \
+    imgproc/drivenet_common/WindowGLFW.hpp \
+    imgproc/drivenet_common/Checks.hpp
 
 FORMS += \
         g_main_window.ui
@@ -88,7 +120,8 @@ LIBS += -L/usr/lib/x86_64-linux-gnu \
     -lboost_system  \
     -lboost_filesystem \
     -lglog \
-    -lgflags
+    -lgflags \
+    -lglfw
 # --------------------------------------------------
 
 # armadillo ----------------------------------------

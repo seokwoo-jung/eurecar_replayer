@@ -32,7 +32,8 @@
 
 cudaStream_t g_cudaStream  = 0;
 
-// Driveworks Handles
+
+//// Driveworks Handles
 dwContextHandle_t gSdk                          = DW_NULL_HANDLE;
 dwRendererHandle_t gRenderer                    = DW_NULL_HANDLE;
 dwRenderBufferHandle_t gLineBuffer              = DW_NULL_HANDLE;
@@ -40,8 +41,11 @@ dwSALHandle_t gSal                              = DW_NULL_HANDLE;
 dwSensorHandle_t gCameraSensor                  = DW_NULL_HANDLE;
 dwRawPipelineHandle_t gRawPipeline              = DW_NULL_HANDLE;
 
-// frame processing
+// Sample variables
+std::string gInputType;
+
 dwImageCUDA gRCBImage{};
+
 dwImageCUDA gRGBAImage{};
 dwImageProperties gRCBProperties{};
 
@@ -49,19 +53,20 @@ dwImageStreamerHandle_t gCuda2gl                = DW_NULL_HANDLE;
 dwImageStreamerHandle_t gInput2cuda             = DW_NULL_HANDLE;
 dwImageFormatConverterHandle_t gConvert2RGBA    = DW_NULL_HANDLE;
 
-// Sample variables
-dwRect gScreenRectangle{};
-std::string gInputType;
+//// frame processing
 
-// Colors for rendering bounding boxes
+//// Sample variables
+dwRect gScreenRectangle{};
+
+//// Colors for rendering bounding boxes
 const uint32_t gMaxBoxColors = 5;
 float32_t gBoxColors[5][4] = {{1.0f, 0.0f, 0.0f, 1.0f},
                               {0.0f, 1.0f, 0.0f, 1.0f},
                               {0.0f, 0.0f, 1.0f, 1.0f},
                               {0.0f, 1.0f, 1.0f, 1.0f},
                               {1.0f, 1.0f, 0.0f, 1.0f}};
-
 //------------------------------------------------------------------------------
+
 void drawROI(dwRect roi, const float32_t color[4], dwRenderBufferHandle_t renderBuffer, dwRendererHandle_t renderer)
 {
     float32_t x_start = static_cast<float32_t>(roi.x) ;
@@ -148,14 +153,14 @@ void initSdk(dwContextHandle_t *context)
 {
     // create a Logger to log to console
     // we keep the ownership of the logger at the application level
-//    dwLogger_initialize(getConsoleLoggerCallback(true));
+    dwLogger_initialize(getConsoleLoggerCallback(true));
     dwLogger_setLogLevel(DW_LOG_VERBOSE);
 
     // instantiate Driveworks SDK context
     dwContextParameters sdkParams{};
 
-//    std::string path = DataPath::get();
-//    sdkParams.dataPath = path.c_str();
+    std::string path = DataPath::get();
+    sdkParams.dataPath = path.c_str();
 
 #ifdef VIBRANTE
     sdkParams.eglDisplay = window->getEGLDisplay();
@@ -247,8 +252,8 @@ bool initSensors(dwSALHandle_t *sal, dwSensorHandle_t *camera, dwImageProperties
     }else
 #endif
     {
-//        std::string parameterString = gArguments.parameterString();
-//        params.parameters           = parameterString.c_str();
+        std::string parameterString = gArguments.parameterString();
+        params.parameters           = parameterString.c_str();
         params.protocol             = "camera.virtual";
         result                      = dwSAL_createSensor(camera, params, *sal);
     }
