@@ -431,178 +431,323 @@ void G_MAIN_WINDOW::on_pushButton_save_lidar_data_clicked()
 
 void G_MAIN_WINDOW::on_pushButton_init_drivenet_clicked()
 {
-    dwStatus status;
-    dwStatus result = DW_SUCCESS;
+//    dwStatus status;
+//    dwStatus result = DW_SUCCESS;
 
-    initSdk(&gSdk);
+//    initSdk(&gSdk);
 
-    // Setting virtual camera ----------------------------------------------------
-    dwSALHandle_t sal = DW_NULL_HANDLE;
-    dwSensorHandle_t camera = DW_NULL_HANDLE;
-    dwRawPipelineHandle_t gRawPipeline              = DW_NULL_HANDLE;
+//    // Setting virtual camera ----------------------------------------------------
+//    dwSALHandle_t sal = DW_NULL_HANDLE;
+//    dwSensorHandle_t camera = DW_NULL_HANDLE;
+//    dwRawPipelineHandle_t gRawPipeline              = DW_NULL_HANDLE;
 
-    // init Drivenet
-    DriveNet drivenet(gSdk);
+//    // init Drivenet
+//    DriveNet drivenet(gSdk);
 
-    // Load sample image
-    cv::Mat ori_img = cv::imread("/home/jung/Documents/1507702514030235.jpg");
+//    // Load sample image
+//    cv::Mat ori_img = cv::imread("/home/jung/Documents/1507702514030235.jpg");
 
-    cv::cvtColor(ori_img,ori_img,CV_BGR2RGB);
+//    cv::cvtColor(ori_img,ori_img,CV_BGR2RGB);
 
-    dwImageCPU  rawImageCPU;
-    dwImageCUDA gRGBCudaImage;
-    dwImageCUDA gRCBImage{};
-    dwImageCUDA gRGBAImage{};
+//    dwImageCPU  rawImageCPU;
+//    dwImageCUDA gRGBCudaImage;
+//    dwImageCUDA gRCBImage{};
+//    dwImageCUDA gRGBAImage{};
 
 
-    dwImageProperties rawImageCPU_prop;
+//    dwImageProperties rawImageCPU_prop;
 
-    rawImageCPU_prop.type = DW_IMAGE_CPU;
-    rawImageCPU_prop.pxlFormat = DW_IMAGE_RGB;
-    rawImageCPU_prop.planeCount = 1;
-    rawImageCPU_prop.width = (uint32_t)ori_img.cols;
-    rawImageCPU_prop.height = (uint32_t)ori_img.rows;
-    rawImageCPU_prop.pxlType = DW_TYPE_UINT8;
+//    rawImageCPU_prop.type = DW_IMAGE_CPU;
+//    rawImageCPU_prop.pxlFormat = DW_IMAGE_RGB;
+//    rawImageCPU_prop.planeCount = 1;
+//    rawImageCPU_prop.width = (uint32_t)ori_img.cols;
+//    rawImageCPU_prop.height = (uint32_t)ori_img.rows;
+//    rawImageCPU_prop.pxlType = DW_TYPE_UINT8;
 
-    dwImageProperties cudaImageRGB_prop;
+//    dwImageProperties cudaImageRGB_prop;
 
-    cudaImageRGB_prop.type = DW_IMAGE_CUDA;
-    cudaImageRGB_prop.pxlFormat = DW_IMAGE_RGB;
-    cudaImageRGB_prop.planeCount = 1;
-    cudaImageRGB_prop.width = (uint32_t)ori_img.cols;
-    cudaImageRGB_prop.height = (uint32_t)ori_img.rows;
-    cudaImageRGB_prop.pxlType = DW_TYPE_UINT8;
+//    cudaImageRGB_prop.type = DW_IMAGE_CUDA;
+//    cudaImageRGB_prop.pxlFormat = DW_IMAGE_RGB;
+//    cudaImageRGB_prop.planeCount = 1;
+//    cudaImageRGB_prop.width = (uint32_t)ori_img.cols;
+//    cudaImageRGB_prop.height = (uint32_t)ori_img.rows;
+//    cudaImageRGB_prop.pxlType = DW_TYPE_UINT8;
 
-    dwImageProperties cudaImage_prop{};
+//    dwImageProperties cudaImage_prop{};
 
-    cudaImage_prop.type = DW_IMAGE_CUDA;
-    cudaImage_prop.pxlFormat = DW_IMAGE_RCB;
-    cudaImage_prop.planeCount = 3;
-    cudaImage_prop.width = (uint32_t)ori_img.cols;
-    cudaImage_prop.height = (uint32_t)ori_img.rows;
-    cudaImage_prop.pxlType = DW_TYPE_UINT8;
+//    cudaImage_prop.type = DW_IMAGE_CUDA;
+//    cudaImage_prop.pxlFormat = DW_IMAGE_RCB;
+//    cudaImage_prop.planeCount = 3;
+//    cudaImage_prop.width = (uint32_t)ori_img.cols;
+//    cudaImage_prop.height = (uint32_t)ori_img.rows;
+//    cudaImage_prop.pxlType = DW_TYPE_UINT8;
 
-    dwImageProperties rgbaImage_prop{};
+//    dwImageProperties rgbaImage_prop{};
 
-    rgbaImage_prop.type = DW_IMAGE_CUDA;
-    rgbaImage_prop.pxlFormat = DW_IMAGE_RGBA;
-    rgbaImage_prop.planeCount = 1;
-    rgbaImage_prop.width = (uint32_t)ori_img.cols;
-    rgbaImage_prop.height = (uint32_t)ori_img.rows;
-    rgbaImage_prop.pxlType = DW_TYPE_UINT8;
+//    rgbaImage_prop.type = DW_IMAGE_CUDA;
+//    rgbaImage_prop.pxlFormat = DW_IMAGE_RGBA;
+//    rgbaImage_prop.planeCount = 1;
+//    rgbaImage_prop.width = (uint32_t)ori_img.cols;
+//    rgbaImage_prop.height = (uint32_t)ori_img.rows;
+//    rgbaImage_prop.pxlType = DW_TYPE_UINT8;
 
-    dwVector2ui cam_resol;
-    cam_resol.x = 960;
-    cam_resol.y = 604;
-    dwCameraProperties camera_props;
-    camera_props.cameraType = DW_CAMERA_GENERIC;
-    camera_props.framerate = 30;
-    camera_props.siblings = 0;
-    camera_props.resolution = cam_resol;
-    camera_props.outputTypes = DW_CAMERA_RAW_IMAGE;
+//    dwVector2ui cam_resol;
+//    cam_resol.x = 960;
+//    cam_resol.y = 604;
+//    dwCameraProperties camera_props;
+//    camera_props.cameraType = DW_CAMERA_GENERIC;
+//    camera_props.framerate = 30;
+//    camera_props.siblings = 0;
+//    camera_props.resolution = cam_resol;
+//    camera_props.outputTypes = DW_CAMERA_RAW_IMAGE;
 
-    dwSensorHandle_t gCameraSensor                  = DW_NULL_HANDLE;
+//    dwSensorHandle_t gCameraSensor                  = DW_NULL_HANDLE;
     
 
-    bool sensorsInitialized = initSensors(&sal, &gCameraSensor, &rawImageCPU_prop, &camera_props, gSdk);
+//    bool sensorsInitialized = initSensors(&sal, &gCameraSensor, &rawImageCPU_prop, &camera_props, gSdk);
 
-    status = dwRawPipeline_initialize(&gRawPipeline, rawImageCPU_prop, camera_props, gSdk);
-    if(status != DW_SUCCESS)
-    {
-        cout << "dw Raw Pipeline initialize failed" << dwGetStatusName(status) << endl;
-    }
-    else{
-        cout << "dw Raw Pipeline initialize success" << endl;
-    }
+//    status = dwRawPipeline_initialize(&gRawPipeline, rawImageCPU_prop, camera_props, gSdk);
+//    if(status != DW_SUCCESS)
+//    {
+//        cout << "dw Raw Pipeline initialize failed" << dwGetStatusName(status) << endl;
+//    }
+//    else{
+//        cout << "dw Raw Pipeline initialize success" << endl;
+//    }
 
-    status = dwImageCPU_create(&rawImageCPU,(const dwImageProperties*)&rawImageCPU_prop);
+//    status = dwImageCPU_create(&rawImageCPU,(const dwImageProperties*)&rawImageCPU_prop);
 
-    if(status != DW_SUCCESS)
-    {
-        cout << "dw ImageCPU create error" << endl;
-    }
-    else{
-        cout << "dw ImageCPU create success" << endl;
-    }
-
-
-    status = dwImageCUDA_create(&gRCBImage,(const dwImageProperties*)&cudaImage_prop,DW_IMAGE_CUDA_PITCH);
-
-    if(status != DW_SUCCESS)
-    {
-        cout << "dw Image CUDA create error" << endl;
-    }
-    else{
-        cout << "dw Image CUDA create success" << endl;
-    }
-
-    status = dwImageCUDA_create(&gRGBAImage,(const dwImageProperties*)&rgbaImage_prop,DW_IMAGE_CUDA_PITCH);
-
-    if(status != DW_SUCCESS)
-    {
-        cout << "dw Image RGBA create error" << endl;
-    }
-    else{
-        cout << "dw Image RGBA create success" << endl;
-    }
+//    if(status != DW_SUCCESS)
+//    {
+//        cout << "dw ImageCPU create error" << endl;
+//    }
+//    else{
+//        cout << "dw ImageCPU create success" << endl;
+//    }
 
 
-    memcpy(rawImageCPU.data[0],ori_img.data, ori_img.total()*ori_img.channels());
+//    status = dwImageCUDA_create(&gRCBImage,(const dwImageProperties*)&cudaImage_prop,DW_IMAGE_CUDA_PITCH);
 
-    dwImageStreamerHandle_t gInput2cuda             = DW_NULL_HANDLE;
-    dwImageStreamerHandle_t gCuda2gl                = DW_NULL_HANDLE;
+//    if(status != DW_SUCCESS)
+//    {
+//        cout << "dw Image CUDA create error" << endl;
+//    }
+//    else{
+//        cout << "dw Image CUDA create success" << endl;
+//    }
 
-    result = result != DW_SUCCESS ? result : dwImageStreamer_initialize(&gInput2cuda, &rawImageCPU_prop, DW_IMAGE_CUDA, gSdk);
-    result = result != DW_SUCCESS ? result : dwImageStreamer_initialize(&gCuda2gl, &rgbaImage_prop, DW_IMAGE_GL, gSdk);
-    if (result != DW_SUCCESS) {
-        std::cerr << "Image streamer initialization failed: " << dwGetStatusName(result) << std::endl;
-        return;
-    }
+//    status = dwImageCUDA_create(&gRGBAImage,(const dwImageProperties*)&rgbaImage_prop,DW_IMAGE_CUDA_PITCH);
 
-    dwImageFormatConverterHandle_t gConvert2RGBA    = DW_NULL_HANDLE;
-    dwImageFormatConverterHandle_t gConvert2CUDA    = DW_NULL_HANDLE;
-
-    // init format converter to convert from RCB->RGBA
-    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvert2RGBA, &cudaImage_prop, &rgbaImage_prop, gSdk);
-    if (result != DW_SUCCESS) {
-        std::cerr << "Image format converter initialization failed: " << dwGetStatusName(result) << std::endl;
-        return;
-    }
-
-    // init format converter to convert from RGB CUDA ->RCB
-    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvert2CUDA, &cudaImageRGB_prop, &cudaImage_prop, gSdk);
-    if (result != DW_SUCCESS) {
-        std::cerr << "Image format converter initialization failed(CUDA): " << dwGetStatusName(result) << std::endl;
-        return;
-    }
+//    if(status != DW_SUCCESS)
+//    {
+//        cout << "dw Image RGBA create error" << endl;
+//    }
+//    else{
+//        cout << "dw Image RGBA create success" << endl;
+//    }
 
 
-    result = dwImageStreamer_postCPU(&rawImageCPU, gInput2cuda);
-    if (result != DW_SUCCESS) {
-        std::cout << "Cannot post raw image: " << dwGetStatusName(result) << std::endl;
-        return;
-    }
+//    memcpy(rawImageCPU.data[0],ori_img.data, ori_img.total()*ori_img.channels());
 
-    dwImageCUDA *rawImageCUDA;
+//    dwImageStreamerHandle_t gInput2cuda             = DW_NULL_HANDLE;
+//    dwImageStreamerHandle_t gCuda2gl                = DW_NULL_HANDLE;
 
-    result = dwImageStreamer_receiveCUDA(&rawImageCUDA, 10000, gInput2cuda);
-    if (result != DW_SUCCESS) {
-        std::cout << "Cannot receive CUDA Image " << dwGetStatusName(result) << std::endl;
-        return;
-    }
+//    result = result != DW_SUCCESS ? result : dwImageStreamer_initialize(&gInput2cuda, &rawImageCPU_prop, DW_IMAGE_CUDA, gSdk);
+//    result = result != DW_SUCCESS ? result : dwImageStreamer_initialize(&gCuda2gl, &rgbaImage_prop, DW_IMAGE_GL, gSdk);
+//    if (result != DW_SUCCESS) {
+//        std::cerr << "Image streamer initialization failed: " << dwGetStatusName(result) << std::endl;
+//        return;
+//    }
 
-    cudaStream_t g_cudaStream  = 0;
+//    dwImageFormatConverterHandle_t gConvert2RGBA    = DW_NULL_HANDLE;
+//    dwImageFormatConverterHandle_t gConvert2CUDA    = DW_NULL_HANDLE;
 
-    dwImageCUDA *rcbImageCUDA;
+//    // init format converter to convert from RCB->RGBA
+//    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvert2RGBA, &cudaImage_prop, &rgbaImage_prop, gSdk);
+//    if (result != DW_SUCCESS) {
+//        std::cerr << "Image format converter initialization failed: " << dwGetStatusName(result) << std::endl;
+//        return;
+//    }
+
+//    // init format converter to convert from RGB CUDA ->RCB
+//    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvert2CUDA, &cudaImageRGB_prop, &cudaImage_prop, gSdk);
+//    if (result != DW_SUCCESS) {
+//        std::cerr << "Image format converter initialization failed(CUDA): " << dwGetStatusName(result) << std::endl;
+//        return;
+//    }
+
+
+//    result = dwImageStreamer_postCPU(&rawImageCPU, gInput2cuda);
+//    if (result != DW_SUCCESS) {
+//        std::cout << "Cannot post raw image: " << dwGetStatusName(result) << std::endl;
+//        return;
+//    }
+
+//    dwImageCUDA *rawImageCUDA;
+
+//    result = dwImageStreamer_receiveCUDA(&rawImageCUDA, 10000, gInput2cuda);
+//    if (result != DW_SUCCESS) {
+//        std::cout << "Cannot receive CUDA Image " << dwGetStatusName(result) << std::endl;
+//        return;
+//    }
+
+//    cudaStream_t g_cudaStream  = 0;
+
+//    dwImageCUDA *rcbImageCUDA;
     
-    status = dwImageFormatConverter_copyConvertCUDA(rcbImageCUDA,rawImageCUDA,gConvert2CUDA,g_cudaStream);
+//    status = dwImageFormatConverter_copyConvertCUDA(rcbImageCUDA,rawImageCUDA,gConvert2CUDA,g_cudaStream);
 
-    if(status != DW_SUCCESS)
-    {
-        cout << "dw CUDA format convert error" << endl;
-    }
-    else{
-        cout << "dw CUDA format convert success" << endl;
+//    if(status != DW_SUCCESS)
+//    {
+//        cout << "dw CUDA format convert error" << endl;
+//    }
+//    else{
+//        cout << "dw CUDA format convert success" << endl;
+//    }
+
+
+
+
+    // Program arguments
+    ProgramArguments arguments({
+    #ifdef VIBRANTE
+        ProgramArguments::Option_t("camera-type", "ar0231-rccb-ssc"),
+        ProgramArguments::Option_t("csi-port", "ab"),
+        ProgramArguments::Option_t("camera-index", "0"),
+        ProgramArguments::Option_t("slave", "0"),
+        ProgramArguments::Option_t("input-type", "video"),
+    #endif
+        ProgramArguments::Option_t("video", "/usr/local/driveworks/data/samples/raw/rccb.raw"),
+                                     ProgramArguments::Option_t("stopFrame", "0")
+    });
+
+    // init framework
+    initSampleApp(0, 0, &arguments, NULL, 1280, 800);
+
+    // set window resize callback
+    gWindow->setOnResizeWindowCallback(resizeWindowCallback);
+
+    // init driveworks
+    initSdk(&gSdk, gWindow);
+
+
+#ifdef VIBRANTE
+    gInputType = gArguments.get("input-type");
+#else
+    gInputType = "video";
+#endif
+
+    // create HAL and camera
+    dwImageProperties rawImageProps;
+    dwCameraProperties cameraProps;
+    bool sensorsInitialized = initSensors(&gSal, &gCameraSensor, &rawImageProps, &cameraProps, gSdk);
+
+    if (sensorsInitialized && initPipeline(rawImageProps, cameraProps, gSdk)) {
+
+        initRenderer(gRCBProperties, &gRenderer, gSdk, gWindow);
+
+        DriveNet drivenet(gSdk);
+
+        drivenet.initDetector(gRCBProperties, g_cudaStream);
+        drivenet.initTracker(gRCBProperties, g_cudaStream);
+
+        runPipeline(drivenet, cameraProps.framerate);
     }
 
+    // release DW modules
+    release();
+
+    // release framework
+    releaseSampleApp();
+}
+
+void G_MAIN_WINDOW::runPipeline(DriveNet &driveNet, float32_t framerate)
+{
+    typedef std::chrono::high_resolution_clock myclock_t;
+    typedef std::chrono::time_point<myclock_t> timepoint_t;
+    auto frameDuration         = std::chrono::milliseconds((int)(1000 / framerate));
+    timepoint_t lastUpdateTime = myclock_t::now();
+
+    uint32_t frame = 0;
+    uint32_t stopFrame = atoi(gArguments.get("stopFrame").c_str());
+
+    gRun = gRun && dwSensor_start(gCameraSensor) == DW_SUCCESS;
+
+    while (gRun && !gWindow->shouldClose()) {
+        std::this_thread::yield();
+
+        // run with at most 30FPS when the input is a video
+        if (gInputType.compare("video") == 0) {
+            std::chrono::milliseconds timeSinceUpdate =
+                std::chrono::duration_cast<std::chrono::milliseconds>(myclock_t::now() - lastUpdateTime);
+            if (timeSinceUpdate < frameDuration)
+                continue;
+
+            lastUpdateTime = myclock_t::now();
+        }
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        dwCameraFrameHandle_t frameHandle;
+        dwStatus result = dwSensorCamera_readFrame(&frameHandle, 0, 90000, gCameraSensor);
+
+        if (result == DW_END_OF_STREAM) {
+            std::cout << "Camera reached end of stream" << std::endl;
+            dwSensor_reset(gCameraSensor);
+            driveNet.resetDetector();
+            driveNet.resetTracker();
+            continue;
+        } else if (result != DW_SUCCESS) {
+            std::cerr << "Cannot read frame: " << dwGetStatusName(result) << std::endl;
+            continue;
+        }
+
+        // Process every second frame in order to avoid latency on iGPU.
+        if ((frame % 2 == 0) || (gInputType.compare("video") == 0)) {
+
+            // get RCB and RGBA images for processing and rendering from the camera frame
+            dwImageCUDA* rcbCudaImage = nullptr;
+            dwImageGL*   rgbaGLImage  = nullptr;
+
+            if (!getNextFrameImages(&rcbCudaImage, &rgbaGLImage, frameHandle))
+            {
+                gRun = false;
+                continue;
+            }
+
+            // render RGBA GL image
+            dwRenderer_renderTexture(rgbaGLImage->tex, rgbaGLImage->target, gRenderer);
+
+            // Detect, track and render objects
+            driveNet.inferDetectorAsync(rcbCudaImage);
+            driveNet.inferTrackerAsync(rcbCudaImage);
+            driveNet.processResults();
+            for (size_t classIdx = 0; classIdx < driveNet.getNumClasses(); classIdx++) {
+
+                // render bounding box
+                dwRenderer_setColor(gBoxColors[classIdx % gMaxBoxColors], gRenderer);
+                drawBoxesWithLabels(driveNet.getResult(classIdx),
+                                    static_cast<float32_t>(gRCBProperties.width),
+                                    static_cast<float32_t>(gRCBProperties.height),
+                                    gLineBuffer, gRenderer);
+            }
+
+            // draw ROI of the first image
+            drawROI(driveNet.drivenetParams.ROIs[0], DW_RENDERER_COLOR_LIGHTBLUE, gLineBuffer, gRenderer);
+
+            // draw ROI of the second image
+            drawROI(driveNet.drivenetParams.ROIs[1], DW_RENDERER_COLOR_YELLOW, gLineBuffer, gRenderer);
+
+            // return used images
+            returnNextFrameImages(rcbCudaImage, rgbaGLImage);
+
+            gWindow->swapBuffers();
+        }
+        dwSensorCamera_returnFrame(&frameHandle);
+        ++frame;
+        if(stopFrame && frame == stopFrame)
+            break;
+    }
+
+    dwSensor_stop(gCameraSensor);
 }

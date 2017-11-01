@@ -89,6 +89,10 @@ private:
     C_T_GRAB_VLP_16_HR* c_t_grab_vlp_16_hr;
     C_T_SENSORFUSION* c_t_sensorfusion = new C_T_SENSORFUSION;
 
+
+private:
+    void runPipeline(DriveNet& driveNet, float32_t framerate);
+
 private:
     QMutex mtx_monitor;
     QMutex mtx_grab_cam[8];

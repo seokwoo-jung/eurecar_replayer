@@ -67,6 +67,11 @@
 // RCCB
 #include <dw/raw/RawPipeline.h>
 
+// opencv
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
 #ifndef DRIVENET_MACRO
 #define DRIVENET_MACRO
 //------------------------------------------------------------------------------
@@ -84,7 +89,7 @@ extern dwRawPipelineHandle_t gRawPipeline;
 //extern dwImageProperties gRCBProperties;
 
 // Sample variables
-//extern std::string gInputType;
+extern std::string gInputType;
 
 // Maximum number of colors for rendering bounding boxes
 extern const uint32_t gMaxBoxColors;
@@ -101,6 +106,7 @@ extern dwImageProperties gRCBProperties;
 extern dwImageStreamerHandle_t gCuda2gl;
 extern dwImageStreamerHandle_t gInput2cuda;
 extern dwImageFormatConverterHandle_t gConvert2RGBA;
+extern dwImageFormatConverterHandle_t gConvertRGB2RAW;
 
 // Sample variables
 extern dwRect gScreenRectangle;
@@ -111,9 +117,9 @@ extern dwRect gScreenRectangle;
 //------------------------------------------------------------------------------
 void drawROI(dwRect roi, const float32_t color[4], dwRenderBufferHandle_t renderBuffer, dwRendererHandle_t renderer);
 void resizeWindowCallback(int width, int height);
-void initRenderer(const dwImageProperties& rcbProperties, dwRendererHandle_t *renderer, dwContextHandle_t context);
+void initRenderer(const dwImageProperties& rcbProperties, dwRendererHandle_t *renderer, dwContextHandle_t context, WindowBase *window);
 bool initPipeline(const dwImageProperties &rawImageProps, const dwCameraProperties &cameraProps, dwContextHandle_t ctx);
-void initSdk(dwContextHandle_t *context);
+void initSdk(dwContextHandle_t *context, WindowBase *window);
 bool initSensors(dwSALHandle_t *sal, dwSensorHandle_t *camera, dwImageProperties *cameraImageProperties,
                  dwCameraProperties* cameraProperties, dwContextHandle_t context);
 void release();

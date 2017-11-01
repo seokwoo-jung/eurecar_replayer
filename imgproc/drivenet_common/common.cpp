@@ -52,6 +52,7 @@ dwImageProperties gRCBProperties{};
 dwImageStreamerHandle_t gCuda2gl                = DW_NULL_HANDLE;
 dwImageStreamerHandle_t gInput2cuda             = DW_NULL_HANDLE;
 dwImageFormatConverterHandle_t gConvert2RGBA    = DW_NULL_HANDLE;
+dwImageFormatConverterHandle_t gConvertRGB2RAW    = DW_NULL_HANDLE;
 
 //// frame processing
 
@@ -121,35 +122,93 @@ bool initPipeline(const dwImageProperties &rawImageProps, const dwCameraProperti
     dwRawPipeline_getDemosaicImageProperties(&gRCBProperties, gRawPipeline);
 
     // RCB image to get output from the RawPipeline
-    dwImageCUDA_create(&gRCBImage, &gRCBProperties, DW_IMAGE_CUDA_PITCH);
 
-    // RGBA image to display over GL
-    dwImageProperties rgbaImageProperties = gRCBProperties;
-    rgbaImageProperties.pxlFormat         = DW_IMAGE_RGBA;
-    rgbaImageProperties.pxlType           = DW_TYPE_UINT8;
-    rgbaImageProperties.planeCount        = 1;
-    dwImageCUDA_create(&gRGBAImage, &rgbaImageProperties, DW_IMAGE_CUDA_PITCH);
 
-    // Setup streamer to pass input to CUDA and from CUDA to GL
-    result = result != DW_SUCCESS ? result : dwImageStreamer_initialize(&gInput2cuda, &rawImageProps, DW_IMAGE_CUDA, ctx);
-    result = result != DW_SUCCESS ? result : dwImageStreamer_initialize(&gCuda2gl, &rgbaImageProperties, DW_IMAGE_GL, ctx);
+//    // RGBA image to display over GL
+//    dwImageProperties rgbaImageProperties = gRCBProperties;
+//    rgbaImageProperties.pxlFormat         = DW_IMAGE_RGBA;
+//    rgbaImageProperties.pxlType           = DW_TYPE_UINT8;
+//    rgbaImageProperties.planeCount        = 1;
+//    dwImageCUDA_create(&gRGBAImage, &rgbaImageProperties, DW_IMAGE_CUDA_PITCH);
+
+//    // Setup streamer to pass input to CUDA and from CUDA to GL
+//    result = result != DW_SUCCESS ? result : dwImageStreamer_initialize(&gInput2cuda, &rawImageProps, DW_IMAGE_CUDA, ctx);
+//    result = result != DW_SUCCESS ? result : dwImageStreamer_initialize(&gCuda2gl, &rgbaImageProperties, DW_IMAGE_GL, ctx);
+//    if (result != DW_SUCCESS) {
+//        std::cout << "Image streamer initialization failed: " << dwGetStatusName(result) << std::endl;
+//        return false;
+//    }
+
+    /*
+     *
+     *  Jung addhoc
+     *
+     * */
+
+    dwImageProperties rawImageCPU_prop;
+
+    rawImageCPU_prop.type = DW_IMAGE_CPU;
+    rawImageCPU_prop.pxlFormat = DW_IMAGE_RGB;
+    rawImageCPU_prop.planeCount = 1;
+    rawImageCPU_prop.width = (uint32_t)960*2;
+    rawImageCPU_prop.height = (uint32_t)604*2;
+    rawImageCPU_prop.pxlType = DW_TYPE_UINT8;
+
+    dwImageProperties rawImageCPU_RAW_prop;
+
+    rawImageCPU_RAW_prop.type = DW_IMAGE_CPU;
+    rawImageCPU_RAW_prop.pxlFormat = DW_IMAGE_RAW;
+    rawImageCPU_RAW_prop.planeCount = 1;
+    rawImageCPU_RAW_prop.width = (uint32_t)960*2;
+    rawImageCPU_RAW_prop.height = (uint32_t)604*2;
+    rawImageCPU_RAW_prop.pxlType = DW_TYPE_UINT8;
+
+    dwImageProperties cudaImage_prop{};
+
+    cudaImage_prop.type = DW_IMAGE_CUDA;
+    cudaImage_prop.pxlFormat = DW_IMAGE_RCB;
+    cudaImage_prop.planeCount = 3;
+    cudaImage_prop.width = (uint32_t)960*2;
+    cudaImage_prop.height = (uint32_t)604*2;
+    cudaImage_prop.pxlType = DW_TYPE_UINT8;
+
+    dwImageCUDA_create(&gRCBImage, &cudaImage_prop, DW_IMAGE_CUDA_PITCH);
+
+    dwImageProperties rgbaImage_prop{};
+
+    rgbaImage_prop.type = DW_IMAGE_CUDA;
+    rgbaImage_prop.pxlFormat = DW_IMAGE_RGBA;
+    rgbaImage_prop.planeCount = 1;
+    rgbaImage_prop.width = (uint32_t)960;
+    rgbaImage_prop.height = (uint32_t)604;
+    rgbaImage_prop.pxlType = DW_TYPE_UINT8;
+
+    dwImageCUDA_create(&gRGBAImage, &rgbaImage_prop, DW_IMAGE_CUDA_PITCH);
+
+    result = result != DW_SUCCESS ? result : dwImageStreamer_initialize(&gInput2cuda, &rawImageCPU_prop, DW_IMAGE_CUDA, ctx);
+    result = result != DW_SUCCESS ? result : dwImageStreamer_initialize(&gCuda2gl, &rgbaImage_prop, DW_IMAGE_GL, ctx);
     if (result != DW_SUCCESS) {
-        std::cout << "Image streamer initialization failed: " << dwGetStatusName(result) << std::endl;
+        std::cerr << "Image streamer initialization failed: " << dwGetStatusName(result) << std::endl;
         return false;
     }
 
     // init format converter to convert from RCB->RGBA
-    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvert2RGBA, &gRCBProperties, &rgbaImageProperties, ctx);
+    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvert2RGBA, &cudaImage_prop, &rgbaImage_prop, ctx);
+//    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvertRGB2RAW, &rawImageCPU_prop, &rawImageCPU_RAW_prop, ctx);
     if (result != DW_SUCCESS) {
         std::cout << "Image format converter initialization failed: " << dwGetStatusName(result) << std::endl;
         return false;
+    }
+    else
+    {
+        std::cout << "Image format converter initialization success " << std::endl;
     }
 
     return true;
 }
 
 //------------------------------------------------------------------------------
-void initSdk(dwContextHandle_t *context)
+void initSdk(dwContextHandle_t *context, WindowBase *window)
 {
     // create a Logger to log to console
     // we keep the ownership of the logger at the application level
@@ -165,22 +224,23 @@ void initSdk(dwContextHandle_t *context)
 #ifdef VIBRANTE
     sdkParams.eglDisplay = window->getEGLDisplay();
 #else
-
+    (void)window;
 #endif
 
     dwInitialize(context, DW_VERSION, &sdkParams);
 }
 
+
 //------------------------------------------------------------------------------
-void initRenderer(const dwImageProperties& rcbProperties, dwRendererHandle_t *renderer, dwContextHandle_t context)
+void initRenderer(const dwImageProperties& rcbProperties, dwRendererHandle_t *renderer, dwContextHandle_t context, WindowBase *window)
 {
     dwStatus result = dwRenderer_initialize(renderer, context);
     if (result != DW_SUCCESS)
         throw std::runtime_error(std::string("Cannot init renderer: ") + dwGetStatusName(result));
 
     // Set some renderer defaults
-//    gScreenRectangle.width  = window->width();
-//    gScreenRectangle.height = window->height();
+    gScreenRectangle.width  = window->width();
+    gScreenRectangle.height = window->height();
     gScreenRectangle.x      = 0;
     gScreenRectangle.y      = 0;
 
@@ -305,8 +365,40 @@ bool getNextFrameImages(dwImageCUDA** rcbCudaImageOut, dwImageGL** rgbaGLImageOu
     dwStatus result = DW_SUCCESS;
 
     const dwCameraDataLines* dataLines;
-    dwImageCPU  *rawImageCPU;
+    dwImageCPU  rawImageCPU;
     dwImageCUDA *rawImageCUDA;
+
+    /*
+     *      Jung add hoc part
+     * */
+    // Load sample image
+    cv::Mat ori_img = cv::imread("/home/jung/Documents/1507702514030235.jpg");
+    cv::resize(ori_img,ori_img,cv::Size(),2,2);
+//    cv::cvtColor(ori_img,ori_img,CV_BGR2RGB);
+
+
+    dwImageProperties rawImageCPU_prop;
+
+    rawImageCPU_prop.type = DW_IMAGE_CPU;
+    rawImageCPU_prop.pxlFormat = DW_IMAGE_RGB;
+    rawImageCPU_prop.planeCount = 1;
+    rawImageCPU_prop.width = (uint32_t)ori_img.cols;
+    rawImageCPU_prop.height = (uint32_t)ori_img.rows;
+    rawImageCPU_prop.pxlType = DW_TYPE_UINT8;
+
+    result = dwImageCPU_create(&rawImageCPU,(const dwImageProperties*)&rawImageCPU_prop);
+
+    if(result != DW_SUCCESS)
+    {
+        std::cout << "dw ImageCPU create error" << std::endl;
+    }
+    else{
+//        std::cout << "dw ImageCPU create success" << std::endl;
+    }
+
+    memcpy(rawImageCPU.data[0],ori_img.data, ori_img.total()*ori_img.channels());
+
+
 
 #ifdef VIBRANTE
     dwImageNvMedia *rawImageNvMedia = nullptr;
@@ -317,13 +409,13 @@ bool getNextFrameImages(dwImageCUDA** rcbCudaImageOut, dwImageGL** rgbaGLImageOu
     }else
 #endif
     {
-        result = dwSensorCamera_getImageCPU(&rawImageCPU, DW_CAMERA_RAW_IMAGE, frameHandle);
+//        result = dwSensorCamera_getImageCPU(&rawImageCPU, DW_CAMERA_RAW_IMAGE, frameHandle);
     }
 
-    if (result != DW_SUCCESS) {
-        std::cout << "Cannot get raw image: " << dwGetStatusName(result) << std::endl;
-        return false;
-    }
+//    if (result != DW_SUCCESS) {
+//        std::cout << "Cannot get raw image: " << dwGetStatusName(result) << std::endl;
+//        return false;
+//    }
     dwSensorCamera_getDataLines(&dataLines, frameHandle);
 
     // process
@@ -333,7 +425,7 @@ bool getNextFrameImages(dwImageCUDA** rcbCudaImageOut, dwImageGL** rgbaGLImageOu
     }else
 #endif
     {
-        result = dwImageStreamer_postCPU(rawImageCPU, gInput2cuda);
+        result = dwImageStreamer_postCPU(&rawImageCPU, gInput2cuda);
     }
     if (result != DW_SUCCESS) {
         std::cout << "Cannot post raw image: " << dwGetStatusName(result) << std::endl;
@@ -348,7 +440,11 @@ bool getNextFrameImages(dwImageCUDA** rcbCudaImageOut, dwImageGL** rgbaGLImageOu
         dwImageCUDA cudaFrame{};
         {
             dwRect roi;
-            dwSensorCamera_getImageROI(&roi, gCameraSensor);
+            roi.x = 0;
+            roi.y = 0;
+            roi.width = 960;
+            roi.height = 604;
+//            dwSensorCamera_getImageROI(&roi, gCameraSensor);
             dwImageCUDA_mapToROI(&cudaFrame, rawImageCUDA, roi);
         }
 
@@ -369,7 +465,8 @@ bool getNextFrameImages(dwImageCUDA** rcbCudaImageOut, dwImageGL** rgbaGLImageOu
     }else
 #endif
     {
-        dwImageStreamer_waitPostedCPU(&rawImageCPU, 10000, gInput2cuda);
+        dwImageCPU  *rawImageCPU_pt = &rawImageCPU;
+        dwImageStreamer_waitPostedCPU(&rawImageCPU_pt, 10000, gInput2cuda);
     }
 
     // RCB -> RGBA
