@@ -47,11 +47,17 @@ std::string gInputType;
 dwImageCUDA gRCBImage{};
 
 dwImageCUDA gRGBAImage{};
+dwImageCUDA gRGGBImage{};
+
 dwImageProperties gRCBProperties{};
 
 dwImageStreamerHandle_t gCuda2gl                = DW_NULL_HANDLE;
 dwImageStreamerHandle_t gInput2cuda             = DW_NULL_HANDLE;
 dwImageFormatConverterHandle_t gConvert2RGBA    = DW_NULL_HANDLE;
+dwImageFormatConverterHandle_t gConvertRGB2RCB    = DW_NULL_HANDLE;
+dwImageFormatConverterHandle_t gConvertRGB2RGBA    = DW_NULL_HANDLE;
+dwImageFormatConverterHandle_t gConvertRGBA2RCB    = DW_NULL_HANDLE;
+dwImageFormatConverterHandle_t gConvertRGB2RGGB    = DW_NULL_HANDLE;
 dwImageFormatConverterHandle_t gConvertRGB2RAW    = DW_NULL_HANDLE;
 
 //// frame processing
@@ -145,7 +151,15 @@ bool initPipeline(const dwImageProperties &rawImageProps, const dwCameraProperti
      *
      * */
 
-    dwImageProperties rawImageCPU_prop;
+    gRCBProperties.type = DW_IMAGE_CUDA;
+    gRCBProperties.pxlFormat = DW_IMAGE_RCB;
+    gRCBProperties.planeCount = 3;
+    gRCBProperties.width = (uint32_t)960*2;
+    gRCBProperties.height = (uint32_t)604*2;
+    gRCBProperties.pxlType = DW_TYPE_FLOAT16;
+
+
+    dwImageProperties rawImageCPU_prop{};
 
     rawImageCPU_prop.type = DW_IMAGE_CPU;
     rawImageCPU_prop.pxlFormat = DW_IMAGE_RGB;
@@ -154,7 +168,7 @@ bool initPipeline(const dwImageProperties &rawImageProps, const dwCameraProperti
     rawImageCPU_prop.height = (uint32_t)604*2;
     rawImageCPU_prop.pxlType = DW_TYPE_UINT8;
 
-    dwImageProperties rawImageCPU_RAW_prop;
+    dwImageProperties rawImageCPU_RAW_prop{};
 
     rawImageCPU_RAW_prop.type = DW_IMAGE_CPU;
     rawImageCPU_RAW_prop.pxlFormat = DW_IMAGE_RAW;
@@ -162,6 +176,27 @@ bool initPipeline(const dwImageProperties &rawImageProps, const dwCameraProperti
     rawImageCPU_RAW_prop.width = (uint32_t)960*2;
     rawImageCPU_RAW_prop.height = (uint32_t)604*2;
     rawImageCPU_RAW_prop.pxlType = DW_TYPE_UINT8;
+
+
+    dwImageProperties cudaImage_prop_RGB{};
+
+    cudaImage_prop_RGB.type = DW_IMAGE_CUDA;
+    cudaImage_prop_RGB.pxlFormat = DW_IMAGE_RGB;
+    cudaImage_prop_RGB.planeCount = 1;
+    cudaImage_prop_RGB.width = (uint32_t)960*2;
+    cudaImage_prop_RGB.height = (uint32_t)604*2;
+    cudaImage_prop_RGB.pxlType = DW_TYPE_UINT8;
+
+    dwImageProperties cudaImage_prop_RGGB{};
+
+    cudaImage_prop_RGGB.type = DW_IMAGE_CUDA;
+    cudaImage_prop_RGGB.pxlFormat = DW_IMAGE_RGGB;
+    cudaImage_prop_RGGB.planeCount = 1;
+    cudaImage_prop_RGGB.width = (uint32_t)960*2;
+    cudaImage_prop_RGGB.height = (uint32_t)604*2;
+    cudaImage_prop_RGGB.pxlType = DW_TYPE_UINT8;
+
+    dwImageCUDA_create(&gRGGBImage, &cudaImage_prop_RGGB, DW_IMAGE_CUDA_PITCH);
 
     dwImageProperties cudaImage_prop{};
 
@@ -179,8 +214,8 @@ bool initPipeline(const dwImageProperties &rawImageProps, const dwCameraProperti
     rgbaImage_prop.type = DW_IMAGE_CUDA;
     rgbaImage_prop.pxlFormat = DW_IMAGE_RGBA;
     rgbaImage_prop.planeCount = 1;
-    rgbaImage_prop.width = (uint32_t)960;
-    rgbaImage_prop.height = (uint32_t)604;
+    rgbaImage_prop.width = (uint32_t)960*2;
+    rgbaImage_prop.height = (uint32_t)604*2;
     rgbaImage_prop.pxlType = DW_TYPE_UINT8;
 
     dwImageCUDA_create(&gRGBAImage, &rgbaImage_prop, DW_IMAGE_CUDA_PITCH);
@@ -194,6 +229,10 @@ bool initPipeline(const dwImageProperties &rawImageProps, const dwCameraProperti
 
     // init format converter to convert from RCB->RGBA
     result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvert2RGBA, &cudaImage_prop, &rgbaImage_prop, ctx);
+    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvertRGB2RCB, &cudaImage_prop_RGB, &cudaImage_prop, ctx);
+    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvertRGB2RGBA, &cudaImage_prop_RGB, &rgbaImage_prop, ctx);
+//    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvertRGBA2RCB, &rgbaImage_prop, &cudaImage_prop, ctx);
+    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvertRGB2RGGB, &cudaImage_prop_RGB, &cudaImage_prop_RGGB, ctx);
 //    result = result != DW_SUCCESS ? result : dwImageFormatConverter_initialize(&gConvertRGB2RAW, &rawImageCPU_prop, &rawImageCPU_RAW_prop, ctx);
     if (result != DW_SUCCESS) {
         std::cout << "Image format converter initialization failed: " << dwGetStatusName(result) << std::endl;
@@ -372,7 +411,7 @@ bool getNextFrameImages(dwImageCUDA** rcbCudaImageOut, dwImageGL** rgbaGLImageOu
      *      Jung add hoc part
      * */
     // Load sample image
-    cv::Mat ori_img = cv::imread("/home/jung/Documents/1507702514030235.jpg");
+    cv::Mat ori_img = cv::imread("/home/usrg_eurecar_stu/Documents/1507702514030235.jpg");
     cv::resize(ori_img,ori_img,cv::Size(),2,2);
 //    cv::cvtColor(ori_img,ori_img,CV_BGR2RGB);
 
@@ -442,16 +481,24 @@ bool getNextFrameImages(dwImageCUDA** rcbCudaImageOut, dwImageGL** rgbaGLImageOu
             dwRect roi;
             roi.x = 0;
             roi.y = 0;
-            roi.width = 960;
-            roi.height = 604;
+            roi.width = 960*2;
+            roi.height = 604*2;
 //            dwSensorCamera_getImageROI(&roi, gCameraSensor);
             dwImageCUDA_mapToROI(&cudaFrame, rawImageCUDA, roi);
         }
 
-        // RAW -> RCB
-        {
-            dwRawPipeline_convertRawToDemosaic(&gRCBImage, &cudaFrame, dataLines, gRawPipeline);
-        }
+//        // RAW -> RCB
+//        {
+//            dwRawPipeline_convertRawToDemosaic(&gRCBImage, &cudaFrame, dataLines, gRawPipeline);
+//        }
+
+//        // RGB -> RCB
+//        {
+//            dwImageFormatConverter_copyConvertCUDA(&gRCBImage, &cudaFrame, gConvertRGB2RCB, g_cudaStream);
+//        }
+
+
+
 
         // return used RAW image, we do not need it anymore, as we now have a copy through the RawPipeline
         dwImageStreamer_returnReceivedCUDA(rawImageCUDA, gInput2cuda);
@@ -469,9 +516,15 @@ bool getNextFrameImages(dwImageCUDA** rcbCudaImageOut, dwImageGL** rgbaGLImageOu
         dwImageStreamer_waitPostedCPU(&rawImageCPU_pt, 10000, gInput2cuda);
     }
 
-    // RCB -> RGBA
+    // RGB -> RGBA
     {
-        dwImageFormatConverter_copyConvertCUDA(&gRGBAImage, &gRCBImage, gConvert2RGBA, g_cudaStream);
+        dwImageFormatConverter_copyConvertCUDA(&gRGBAImage, rawImageCUDA, gConvertRGB2RGBA, g_cudaStream);
+    }
+
+//    dwImageCUDA cuda_RGGB_img_tmp{};
+    // RGB -> RGGB
+    {
+        dwImageFormatConverter_copyConvertCUDA(&gRGGBImage, rawImageCUDA, gConvertRGB2RGGB, g_cudaStream);
     }
 
     // get GL image
@@ -483,6 +536,7 @@ bool getNextFrameImages(dwImageCUDA** rcbCudaImageOut, dwImageGL** rgbaGLImageOu
     // RCB result
     *rcbCudaImageOut = &gRCBImage;
 
+//    *rcbCudaImageOut = rawImageCUDA;
     return true;
 }
 

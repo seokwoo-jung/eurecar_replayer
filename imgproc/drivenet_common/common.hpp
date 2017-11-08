@@ -101,6 +101,7 @@ extern float32_t gBoxColors[][4];
 extern dwImageCUDA gRCBImage;
 
 extern dwImageCUDA gRGBAImage;
+extern dwImageCUDA gRGGBImage;
 extern dwImageProperties gRCBProperties;
 
 extern dwImageStreamerHandle_t gCuda2gl;
