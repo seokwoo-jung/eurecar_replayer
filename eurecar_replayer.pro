@@ -47,7 +47,8 @@ SOURCES += \
     imgproc/drivenet_common/DriveNet.cpp \
     imgproc/drivenet_common/ProgramArguments.cpp \
     imgproc/drivenet_common/SampleFramework.cpp \
-    imgproc/drivenet_common/WindowGLFW.cpp
+    imgproc/drivenet_common/WindowGLFW.cpp \
+    glwidget.cpp
 
 HEADERS += \
         g_main_window.h \
@@ -86,10 +87,13 @@ HEADERS += \
     imgproc/drivenet_common/VBO.hpp \
     imgproc/drivenet_common/Window.hpp \
     imgproc/drivenet_common/WindowGLFW.hpp \
-    imgproc/drivenet_common/Checks.hpp
+    imgproc/drivenet_common/Checks.hpp \
+    glwidget.h \
+    lcm/eurecar_lcmtypes/eurecar/vision_bbox.hpp
 
 FORMS += \
-        g_main_window.ui
+        g_main_window.ui \
+    glwidget.ui
 
 
 
@@ -222,3 +226,7 @@ LIBS += -L/usr/local/lib \
     -lpcl_sample_consensus \
     -lgomp
 # -------------------------------------------------
+
+# Qt opengl
+INCLUDEPATH += /home/usrg_eurecar_stu/Qt/5.7/gcc_64/include/QtOpenGL
+

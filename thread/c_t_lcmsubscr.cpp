@@ -15,7 +15,7 @@ void C_T_LCMSUBSCR::LCMSubscribe()
 
 void C_T_LCMSUBSCR::LCMHandle()
 {
-    m_lcm_obj->handleTimeout(1);
+    m_lcm_obj->handleTimeout(0);
 }
 
 void C_T_LCMSUBSCR::run()

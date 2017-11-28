@@ -487,19 +487,6 @@ bool getNextFrameImages(dwImageCUDA** rcbCudaImageOut, dwImageGL** rgbaGLImageOu
             dwImageCUDA_mapToROI(&cudaFrame, rawImageCUDA, roi);
         }
 
-//        // RAW -> RCB
-//        {
-//            dwRawPipeline_convertRawToDemosaic(&gRCBImage, &cudaFrame, dataLines, gRawPipeline);
-//        }
-
-//        // RGB -> RCB
-//        {
-//            dwImageFormatConverter_copyConvertCUDA(&gRCBImage, &cudaFrame, gConvertRGB2RCB, g_cudaStream);
-//        }
-
-
-
-
         // return used RAW image, we do not need it anymore, as we now have a copy through the RawPipeline
         dwImageStreamer_returnReceivedCUDA(rawImageCUDA, gInput2cuda);
     }

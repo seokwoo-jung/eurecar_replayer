@@ -87,7 +87,6 @@ private:
     // Thresholds for filtering out detections after clustering
     std::vector<float32_t> postClusteringThresholds;
 
-
     // -------- intermediate results ------
 
     // Number of detected proposals per object class

@@ -45,11 +45,15 @@
 #include "3d_view/c_3d_viewer.h"
 
 #include "lcm/c_lcm_handler.h"
+#include "lcm/eurecar_lcmtypes/eurecar/vision_bbox.hpp"
 
 
 // drivenet
 #include "imgproc/drivenet_common/common.hpp"
 #include "imgproc/drivenet_common/DriveNet.hpp"
+
+// custom widget
+#include "glwidget.h"
 
 using namespace std;
 
@@ -77,6 +81,8 @@ private slots:
     void on_pushButton_save_lidar_data_clicked();
 
     void on_pushButton_init_drivenet_clicked();
+
+    void on_pushButton_gltest_clicked();
 
 private:
     Ui::G_MAIN_WINDOW *ui;
@@ -129,6 +135,8 @@ private:
 
     vector<cv::Point> m_fusion_img_coord_list;
     vector<cv::Point3f> m_fusion_real_coord_list;
+
+    eurecar::vision_bbox vision_bbox_data;
 
 public slots:
     void SLOT_C_T_MONITOR_2_MAIN();
